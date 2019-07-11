@@ -6,9 +6,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.security.Principal;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 @RestController
 public class AController {
@@ -16,6 +13,10 @@ public class AController {
   @GetMapping({"oauth/userInfo", "/"})
   public String userInfo(HttpServletRequest request) {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    return authentication.getName();
+    return String.format("0=%s, 1=%s, 2=%s, 3=%s, ",
+            authentication.getPrincipal(),
+            authentication.getAuthorities(),
+            authentication.getAuthorities(),
+            authentication.getAuthorities());
   }
 }

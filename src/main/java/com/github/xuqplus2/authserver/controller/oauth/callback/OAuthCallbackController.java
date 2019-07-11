@@ -39,6 +39,16 @@ import java.util.List;
 @Slf4j
 public class OAuthCallbackController {
 
+  /**
+   * todo, 第三方oauth登录授予基础权限
+   */
+  private static final List<GrantedAuthority> BASIC_AUTHORITIES = new ArrayList<>(1);
+  private static final SimpleGrantedAuthority BASIC = new SimpleGrantedAuthority("BASIC");
+
+  static {
+    BASIC_AUTHORITIES.add(BASIC);
+  }
+
   @Autowired
   OAuthApp.GithubApp githubApp;
   @Autowired
@@ -90,13 +100,9 @@ public class OAuthCallbackController {
         /* 手动设置登录状态 jaas */
         // credential 保存access token,
         // principal 只保存用户id 节省空间, 需要详细信息时, 查询数据库或者用token调用用户信息接口
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority("aaa"));
-        authorities.add(new SimpleGrantedAuthority("ROLE_admin"));
-
         String principal = String.format("%s,%s", OAuthApp.GithubApp.class.getSimpleName(), githubUserInfo.getLogin());
         JaasAuthenticationToken jaasAuthenticationToken =
-                new JaasAuthenticationToken(principal, githubAccessToken, authorities, null);
+                new JaasAuthenticationToken(principal, githubAccessToken, Collections.EMPTY_LIST, null);
         SecurityContextHolder.getContext().setAuthentication(jaasAuthenticationToken);
       }
     }
