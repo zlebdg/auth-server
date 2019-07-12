@@ -6,6 +6,14 @@
 <body>
 <a href="/oauth/login/github">Github授权登录</a>
 <a href="/oauth/login/alipay">OpenAlipay授权登录</a>
-<a href="/login">本系统登录</a>
+<hr>
+
+<a href="#">本系统账号登录</a>
+
+<form method="post" action="/login">
+    <input name="username" value="admin">
+    <input name="password" value="123456">
+    <input type="submit">
+</form>
 </body>
 </html>

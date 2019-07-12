@@ -6,10 +6,10 @@ import org.junit.Test;
 @Slf4j
 public class OAuthAppTest {
 
-  @Test
-  public void a() {
-    log.info(OAuthApp.GithubApp.class.getSimpleName());
-    log.info(OAuthApp.GithubApp.class.getName());
-    log.info(OAuthApp.GithubApp.class.getTypeName());
-  }
+    @Test
+    public void a() {
+        log.info(OAuthApp.GithubApp.class.getSimpleName());
+        log.info(OAuthApp.GithubApp.class.getName());
+        log.info(OAuthApp.GithubApp.class.getTypeName());
+    }
 }

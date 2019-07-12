@@ -17,32 +17,32 @@ import java.net.URLEncoder;
 @Slf4j
 public class OauthLoginController {
 
-  private static final String TEMPLATE_AUTHORIZE_URL_GITHUB =
-          "redirect:https://github.com/login/oauth/authorize?client_id=%s&redirect_uri=%s&scope=%s&state=%s";
-  private static final String TEMPLATE_AUTHORIZE_URL_ALIAPY =
-          "redirect:https://openauth.alipay.com/oauth2/publicAppAuthorize.htm?app_id=%s&redirect_uri=%s&scope=%s&state=%s";
-  final int STATE_LENGTH = 20;
+    private static final String TEMPLATE_AUTHORIZE_URL_GITHUB =
+            "redirect:https://github.com/login/oauth/authorize?client_id=%s&redirect_uri=%s&scope=%s&state=%s";
+    private static final String TEMPLATE_AUTHORIZE_URL_ALIAPY =
+            "redirect:https://openauth.alipay.com/oauth2/publicAppAuthorize.htm?app_id=%s&redirect_uri=%s&scope=%s&state=%s";
+    final int STATE_LENGTH = 20;
 
-  @Autowired
-  OAuthApp.GithubApp githubApp;
-  @Autowired
-  OAuthApp.AlipayApp alipayApp;
+    @Autowired
+    OAuthApp.GithubApp githubApp;
+    @Autowired
+    OAuthApp.AlipayApp alipayApp;
 
-  @GetMapping("github")
-  public ModelAndView github(ModelAndView mav) {
-    mav.setViewName(String.format(
-            TEMPLATE_AUTHORIZE_URL_GITHUB,
-            githubApp.getClientId(),
-            githubApp.getRedirectUri(),
-            githubApp.getScope(),
-            RandomUtil.numiric(STATE_LENGTH)));
-    return mav;
-  }
+    @GetMapping("github")
+    public ModelAndView github(ModelAndView mav) {
+        mav.setViewName(String.format(
+                TEMPLATE_AUTHORIZE_URL_GITHUB,
+                githubApp.getClientId(),
+                githubApp.getRedirectUri(),
+                githubApp.getScope(),
+                RandomUtil.numiric(STATE_LENGTH)));
+        return mav;
+    }
 
-  @GetMapping("alipay")
-  public ModelAndView alipay(ModelAndView mav) throws UnsupportedEncodingException {
-    mav.setViewName(String.format(TEMPLATE_AUTHORIZE_URL_ALIAPY,
-            alipayApp.getAppId(), URLEncoder.encode(alipayApp.getAuthCallbackUrl(), alipayApp.getCharset()), alipayApp.getScope(), RandomUtil.numiric(STATE_LENGTH)));
-    return mav;
-  }
+    @GetMapping("alipay")
+    public ModelAndView alipay(ModelAndView mav) throws UnsupportedEncodingException {
+        mav.setViewName(String.format(TEMPLATE_AUTHORIZE_URL_ALIAPY,
+                alipayApp.getAppId(), URLEncoder.encode(alipayApp.getAuthCallbackUrl(), alipayApp.getCharset()), alipayApp.getScope(), RandomUtil.numiric(STATE_LENGTH)));
+        return mav;
+    }
 }

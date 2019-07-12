@@ -25,67 +25,67 @@ import org.springframework.security.oauth2.provider.token.store.InMemoryTokenSto
 // todo, auth server 重启导致已发出的token全部失效..
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
 
-  @Override
-  public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-    // 使用内存存储OAuth客户端信息
-    String secret = "secret";
-    String noop = String.format("{noop}%s", secret);
-    //    String bcrypt = String.format("{bcrypt}%s", new BCryptPasswordEncoder().encode(secret));
-    //    String scrypt = String.format("{scrypt}%s", new SCryptPasswordEncoder().encode(secret));
-    clients
-            .inMemory()
-            /* client */
-            .withClient("client") //
-            .secret(noop) //
-            .authorizedGrantTypes(
-                    "password", "authorization_code", "implicit", "refresh_token")
-            .resourceIds("resourceId") //
-            .redirectUris(
-                    "http://aaa.local:20000/login",
-                    "http://bbb.local:20000/login",
-                    "http://dev.local:20000/login",
-                    "http://106.12.80.76:8080/login",
-                    "http://106.12.80.76:8081/login",
-                    "http://dev.local:20001/login"
-            ) //
-            .scopes("aaa", "bbb", "ccc", "ddd");
-  }
+    @Override
+    public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
+        // 使用内存存储OAuth客户端信息
+        String secret = "secret";
+        String noop = String.format("{noop}%s", secret);
+        //    String bcrypt = String.format("{bcrypt}%s", new BCryptPasswordEncoder().encode(secret));
+        //    String scrypt = String.format("{scrypt}%s", new SCryptPasswordEncoder().encode(secret));
+        clients
+                .inMemory()
+                /* client */
+                .withClient("client") //
+                .secret(noop) //
+                .authorizedGrantTypes(
+                        "password", "authorization_code", "implicit", "refresh_token")
+                .resourceIds("resourceId") //
+                .redirectUris(
+                        "http://aaa.local:20000/login",
+                        "http://bbb.local:20000/login",
+                        "http://dev.local:20000/login",
+                        "http://106.12.80.76:8080/login",
+                        "http://106.12.80.76:8081/login",
+                        "http://dev.local:20001/login"
+                ) //
+                .scopes("aaa", "bbb", "ccc", "ddd");
+    }
 
-  @Override
-  public void configure(AuthorizationServerEndpointsConfigurer endpoints) {
-    endpoints
-            .tokenStore(tokenStore)
-            .approvalStore(approvalStore)
-            .authenticationManager(authenticationManager)
-            .allowedTokenEndpointRequestMethods(HttpMethod.GET, HttpMethod.POST);
-  }
+    @Override
+    public void configure(AuthorizationServerEndpointsConfigurer endpoints) {
+        endpoints
+                .tokenStore(tokenStore)
+                .approvalStore(approvalStore)
+                .authenticationManager(authenticationManager)
+                .allowedTokenEndpointRequestMethods(HttpMethod.GET, HttpMethod.POST);
+    }
 
-  @Override
-  public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
-    security
-            .allowFormAuthenticationForClients()
-            .tokenKeyAccess("permitAll()")
-            .checkTokenAccess("isAuthenticated()");
-  }
+    @Override
+    public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
+        security
+                .allowFormAuthenticationForClients()
+                .tokenKeyAccess("permitAll()")
+                .checkTokenAccess("isAuthenticated()");
+    }
 
-  @Bean
-  public TokenStore tokenStore() {
-    return new InMemoryTokenStore();
-  }
+    @Bean
+    public TokenStore tokenStore() {
+        return new InMemoryTokenStore();
+    }
 
-  @Bean
-  public ApprovalStore approvalStore() {
-    TokenApprovalStore store = new TokenApprovalStore();
-    store.setTokenStore(tokenStore);
-    return store;
-  }
+    @Bean
+    public ApprovalStore approvalStore() {
+        TokenApprovalStore store = new TokenApprovalStore();
+        store.setTokenStore(tokenStore);
+        return store;
+    }
 
-  @Autowired
-  TokenStore tokenStore;
+    @Autowired
+    TokenStore tokenStore;
 
-  @Autowired
-  ApprovalStore approvalStore;
+    @Autowired
+    ApprovalStore approvalStore;
 
-  @Autowired
-  AuthenticationManager authenticationManager;
+    @Autowired
+    AuthenticationManager authenticationManager;
 }
