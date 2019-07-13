@@ -34,7 +34,7 @@ import static com.github.xuqplus2.authserver.controller.handler.AppErrorControll
 public class AppErrorController implements ErrorController {
 
     public static final String ERROR_PATH = "/error"; // do not change
-    public static final boolean INCLUDE_STACK_TRACE = false;
+    public static final boolean INCLUDE_STACK_TRACE = false; // 不需要把错误信息打印到前端
 
     @Value("${server.error.path:${error.path:/error}}")
     String aaa;
