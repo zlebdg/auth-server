@@ -8,13 +8,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.imageio.ImageIO;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-
-import static java.lang.System.out;
 
 @RestController
 @RequestMapping("captcha")
@@ -24,7 +22,7 @@ public class CaptchaController {
     DefaultKaptcha defaultKaptcha;
 
     @GetMapping
-    public void a(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void a(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException {
         response.setDateHeader("Expires", 0);
         // Set standard HTTP/1.1 no-cache headers.
         response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
@@ -37,16 +35,17 @@ public class CaptchaController {
         // create the text for the image
         String capText = defaultKaptcha.createText();
         // store the text in the session
-        request.getSession().setAttribute(Constants.KAPTCHA_SESSION_KEY, capText);
+        session.setAttribute(Constants.KAPTCHA_SESSION_KEY, capText);
+        // store the timestamp in the session
+        session.setAttribute(Constants.KAPTCHA_SESSION_DATE, System.currentTimeMillis());
         try {
             // create the image with the text
             BufferedImage bi = defaultKaptcha.createImage(capText);
-            ServletOutputStream out = response.getOutputStream();
             // write the data out
-            ImageIO.write(bi, "jpg", out);
-            out.flush();
+            ImageIO.write(bi, "jpg", response.getOutputStream());
+            response.getOutputStream().flush();
         } finally {
-            if (null != out) out.close();
+            response.getOutputStream().close();
         }
     }
 }
