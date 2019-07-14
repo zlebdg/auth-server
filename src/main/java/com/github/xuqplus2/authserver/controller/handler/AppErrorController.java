@@ -1,7 +1,6 @@
 package com.github.xuqplus2.authserver.controller.handler;
 
-import com.alibaba.fastjson.JSON;
-import com.github.xuqplus2.authserver.vo.BasicVO;
+import com.github.xuqplus2.authserver.vo.resp.BasicResp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.web.servlet.error.AbstractErrorController;
@@ -10,6 +9,7 @@ import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.ServletWebRequest;
@@ -50,29 +50,25 @@ public class AppErrorController implements ErrorController {
     /* text/html */
     @RequestMapping(produces = MediaType.TEXT_HTML_VALUE)
     public ModelAndView errorHtml(ModelAndView mav, HttpServletRequest request, HttpServletResponse response) {
-        mav.addObject("vo", this.jsonError(request, response));
+        ResponseEntity responseEntity = this.jsonError(request, response);
+        mav.addObject("vo", responseEntity.getBody());
         mav.setViewName("error");
         return mav;
     }
 
     /* application/json */
     @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public BasicVO jsonError(HttpServletRequest request, HttpServletResponse response) {
-        HttpStatus status = getStatus(request);
+    public ResponseEntity jsonError(HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> attributes = Collections.unmodifiableMap(
                 this.errorAttributes.getErrorAttributes(new ServletWebRequest(request), INCLUDE_STACK_TRACE));
         //        Throwable error = this.errorAttributes.getError(new ServletWebRequest(request));
-        response.setStatus(status.value());
-        return BasicVO.builder()
-                .code((Integer) attributes.get("status"))
-                .message((String) attributes.get("message"))
-                .data(JSON.toJSONString(attributes))
-                .build();
+        String message = (String) attributes.get("message");
+        return BasicResp.err(getStatus(request), message, attributes);
     }
 
     /* */
     @RequestMapping
-    public BasicVO allError(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity allError(HttpServletRequest request, HttpServletResponse response) {
         return this.jsonError(request, response);
     }
 
