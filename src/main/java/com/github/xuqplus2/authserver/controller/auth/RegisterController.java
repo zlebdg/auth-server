@@ -3,6 +3,7 @@ package com.github.xuqplus2.authserver.controller.auth;
 import com.github.xuqplus2.authserver.service.AuthService;
 import com.github.xuqplus2.authserver.service.PasswordNotSetException;
 import com.github.xuqplus2.authserver.service.RegisterException;
+import com.github.xuqplus2.authserver.service.VerifiedException;
 import com.github.xuqplus2.authserver.vo.req.Register;
 import com.github.xuqplus2.authserver.vo.req.RegisterVerify;
 import com.github.xuqplus2.authserver.vo.resp.BasicResp;
@@ -77,7 +78,7 @@ public class RegisterController {
      * 验证
      */
     @GetMapping(value = "verify", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity verify(@Valid RegisterVerify verify, BindingResult bindingResult) throws RegisterException, PasswordNotSetException {
+    public ResponseEntity verify(@Valid RegisterVerify verify, BindingResult bindingResult) throws RegisterException, PasswordNotSetException, VerifiedException {
         log.info("verify", verify);
         bindingCheck(bindingResult);
         authService.verify(verify);
@@ -87,12 +88,14 @@ public class RegisterController {
     @GetMapping(value = "verify", produces = MediaType.ALL_VALUE)
     public ModelAndView verify(@Valid RegisterVerify verify, BindingResult bindingResult, ModelAndView mav) throws RegisterException {
         try {
-            ResponseEntity responseEntity = this.verify(verify, bindingResult);
-            mav.addObject("vo", responseEntity.getBody());
-            mav.setViewName("auth/register");
+            this.verify(verify, bindingResult);
+            mav.setViewName("ok");
             return mav;
         } catch (PasswordNotSetException e) {
             mav.setViewName("auth/verify/setPassword");
+            return mav;
+        } catch (VerifiedException e) {
+            mav.setViewName("auth/verify/verified");
             return mav;
         }
     }

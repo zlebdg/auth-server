@@ -7,12 +7,12 @@ public class BasicDomainListener {
 
     @PrePersist
     public void PrePersist(BasicDomain domain) {
-        if (null == domain.createAt) domain.createAt = System.currentTimeMillis();
-        if (null == domain.isDeleted) domain.isDeleted = false;
+        if (null == domain.getCreateAt()) domain.setCreateAt(System.currentTimeMillis());
+        if (null == domain.getIsDeleted()) domain.setIsDeleted(false);
     }
 
     @PreUpdate
     public void PreUpdate(BasicDomain domain) {
-        domain.updateAt = System.currentTimeMillis();
+        domain.setUpdateAt(System.currentTimeMillis());
     }
 }

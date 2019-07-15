@@ -10,8 +10,10 @@ import javax.validation.constraints.Pattern;
 @Data
 public class Register extends VO {
 
+    public static final String USERNAME_REGEXP = "^[\\w\\u4e00-\\u9fa5-@#./\\\\]{1,64}$";
+
     @NotBlank
-    @Pattern(regexp = "^[\\w\\u4e00-\\u9fa5]{1,64}$")
+    @Pattern(regexp = USERNAME_REGEXP)
     private String username;
     @NotBlank
     @Email

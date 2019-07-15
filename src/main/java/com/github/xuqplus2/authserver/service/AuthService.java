@@ -43,8 +43,8 @@ public class AuthService {
                 || appRegisterRepository.existsByUsername(register.getUsername())) {
             throw new RegisterException("用户名已经注册");
         }
-        if (appUserRepository.existsByEmail(register.getUsername())
-                || appRegisterRepository.existsByEmail(register.getUsername())) {
+        if (appUserRepository.existsByEmail(register.getEmail())
+                || appRegisterRepository.existsByEmail(register.getEmail())) {
             throw new RegisterException("邮箱已经注册");
         }
         AppRegister appRegister = new AppRegister(register);
@@ -54,10 +54,13 @@ public class AuthService {
     }
 
     @Transactional
-    public void verify(RegisterVerify verify) throws RegisterException, PasswordNotSetException {
+    public void verify(RegisterVerify verify) throws RegisterException, PasswordNotSetException, VerifiedException {
         AppRegister register = appRegisterRepository.getByUsername(verify.getUsername());
         if (null == register) {
             throw new RegisterException("没有查到注册信息");
+        }
+        if (register.getIsDeleted()) {
+            throw new VerifiedException();
         }
         if (!verify.getVerifyCode().equalsIgnoreCase(register.getVerifyCode())) {
             throw new RegisterException("验证失败");
@@ -67,7 +70,8 @@ public class AuthService {
         }
         AppUser appUser = new AppUser(register, verify);
         appUserRepository.save(appUser);
-        appRegisterRepository.delete(register);
+        register.setIsDeleted(true);
+        appRegisterRepository.save(register);
         log.info("注册完成, username=>{}", appUser.getUsername());
     }
 }

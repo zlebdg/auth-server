@@ -12,7 +12,7 @@ import javax.validation.constraints.Pattern;
 public class RegisterVerify extends VO {
 
     @NotBlank
-    @Pattern(regexp = "^[\\w\\u4e00-\\u9fa5]{1,64}$")
+    @Pattern(regexp = Register.USERNAME_REGEXP)
     private String username;
     @NotBlank
     private String verifyCode;
