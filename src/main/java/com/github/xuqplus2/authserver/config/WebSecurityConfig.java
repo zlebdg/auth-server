@@ -1,5 +1,6 @@
 package com.github.xuqplus2.authserver.config;
 
+import com.github.xuqplus2.authserver.service.AppUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +14,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    AppUserDetailsService appUserDetailsService;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -56,6 +60,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .withUser("normal").password(encoder.encode("123456")).roles("normal").authorities("normal2").and()
                 .withUser("admin").password(encoder.encode("123456")).roles("admin").and()
                 .withUser("root").password(encoder.encode("123456")).roles("root");
+        builder.userDetailsService(appUserDetailsService);
     }
 
     @Bean

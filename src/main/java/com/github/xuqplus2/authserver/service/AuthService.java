@@ -2,6 +2,9 @@ package com.github.xuqplus2.authserver.service;
 
 import com.github.xuqplus2.authserver.domain.AppRegister;
 import com.github.xuqplus2.authserver.domain.AppUser;
+import com.github.xuqplus2.authserver.exception.PasswordNotSetException;
+import com.github.xuqplus2.authserver.exception.RegisterException;
+import com.github.xuqplus2.authserver.exception.VerifiedException;
 import com.github.xuqplus2.authserver.listener.AppRegisterEvent;
 import com.github.xuqplus2.authserver.repository.AppRegisterRepository;
 import com.github.xuqplus2.authserver.repository.AppUserRepository;

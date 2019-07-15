@@ -1,9 +1,9 @@
 package com.github.xuqplus2.authserver.controller.auth;
 
+import com.github.xuqplus2.authserver.exception.PasswordNotSetException;
+import com.github.xuqplus2.authserver.exception.RegisterException;
+import com.github.xuqplus2.authserver.exception.VerifiedException;
 import com.github.xuqplus2.authserver.service.AuthService;
-import com.github.xuqplus2.authserver.service.PasswordNotSetException;
-import com.github.xuqplus2.authserver.service.RegisterException;
-import com.github.xuqplus2.authserver.service.VerifiedException;
 import com.github.xuqplus2.authserver.vo.req.Register;
 import com.github.xuqplus2.authserver.vo.req.RegisterVerify;
 import com.github.xuqplus2.authserver.vo.resp.BasicResp;

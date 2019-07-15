@@ -87,8 +87,8 @@ public class RandomUtilTest {
 
     @Test
     public void g() {
-        System.err.println(String.valueOf(-12123));
-        System.err.println(String.valueOf(12123));
+        System.err.println(-12123);
+        System.err.println(12123);
 
 //        000000012123
         System.err.println(String.format("%012d", 12123));
