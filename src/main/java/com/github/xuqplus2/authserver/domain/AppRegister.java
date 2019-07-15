@@ -35,5 +35,9 @@ public class AppRegister extends BasicDomain {
         this.verifyCode = RandomUtil.string(VERIFY_CODE_LENGTH);
         this.verifyUri = register.getVerifyUri();
     }
+
+    public void refreshVerifyCode() {
+        this.verifyCode = RandomUtil.string(VERIFY_CODE_LENGTH);
+    }
 }
 

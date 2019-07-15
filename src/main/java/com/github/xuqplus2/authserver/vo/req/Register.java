@@ -21,4 +21,5 @@ public class Register extends VO {
     @NotBlank
     private String captcha;
     private String verifyUri;
+    private boolean resendEmail;
 }

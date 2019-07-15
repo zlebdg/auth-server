@@ -14,7 +14,15 @@
     <div style="width:200px;height:50px;display:inline-block;">
         <img src="/captcha" alt="点击刷新" onclick="src='/captcha';">
     </div>
-    <input type="submit">
+    <input type="submit" value="注册" onclick="setTheValue(false)">
+    <input type="submit" value="重发邮件" onclick="setTheValue(true)">
+
+    <input name="resendEmail" type="hidden">
 </form>
+<script>
+    function setTheValue(resendEmail) {
+        document.querySelector('input[name=resendEmail]').value = resendEmail
+    }
+</script>
 </body>
 </html>

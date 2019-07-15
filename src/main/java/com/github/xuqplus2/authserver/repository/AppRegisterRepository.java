@@ -10,4 +10,6 @@ public interface AppRegisterRepository extends JpaRepository<AppRegister, String
     boolean existsByEmail(String email);
 
     AppRegister getByUsername(String username);
+
+    AppRegister getByUsernameAndEmailAndIsDeletedFalse(String username, String email);
 }

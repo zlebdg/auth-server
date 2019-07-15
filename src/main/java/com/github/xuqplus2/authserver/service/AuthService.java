@@ -23,12 +23,16 @@ import javax.transaction.Transactional;
 public class AuthService {
 
     private static final long CAPTCHA_EXPIRED = 1000L * 60 * 10;
+    private static final long REGISTER_EVENT_PUBLISH_INTERVAL = 1000L * 60;
 
     @Autowired
     AppUserRepository appUserRepository;
 
     @Autowired
     AppRegisterRepository appRegisterRepository;
+
+    @Autowired
+    EncryptService encryptService;
 
     @Autowired
     ApplicationEventPublisher eventPublisher;
@@ -40,14 +44,33 @@ public class AuthService {
         if (!register.getCaptcha().equalsIgnoreCase(text)) {
             throw new RegisterException("图形验证码错误");
         }
-        // 用户名/邮箱格式检查
-        // todo
-        if (appUserRepository.existsByUsername(register.getUsername())
-                || appRegisterRepository.existsByUsername(register.getUsername())) {
+        if (appUserRepository.existsByUsername(register.getUsername())) {
             throw new RegisterException("用户名已经注册");
         }
-        if (appUserRepository.existsByEmail(register.getEmail())
-                || appRegisterRepository.existsByEmail(register.getEmail())) {
+        if (appUserRepository.existsByEmail(register.getEmail())) {
+            throw new RegisterException("邮箱已经注册");
+        }
+        /* 重发邮件 */
+        if (register.isResendEmail()) {
+            AppRegister appRegister = appRegisterRepository.getByUsernameAndEmailAndIsDeletedFalse(register.getUsername(), register.getEmail());
+            if (null != appRegister) {
+                // 邮件重发间隔
+                if ((null == appRegister.getUpdateAt() && System.currentTimeMillis() - appRegister.getCreateAt() > REGISTER_EVENT_PUBLISH_INTERVAL)
+                        || System.currentTimeMillis() - appRegister.getUpdateAt() > REGISTER_EVENT_PUBLISH_INTERVAL) {
+                    appRegister.refreshVerifyCode();
+                    appRegisterRepository.save(appRegister);
+                    // 发布事件
+                    eventPublisher.publishEvent(new AppRegisterEvent(appRegister));
+                    return;
+                } else {
+                    throw new RegisterException("未满足邮件重发间隔");
+                }
+            }
+        }
+        if (appRegisterRepository.existsByUsername(register.getUsername())) {
+            throw new RegisterException("用户名已经注册");
+        }
+        if (appRegisterRepository.existsByEmail(register.getEmail())) {
             throw new RegisterException("邮箱已经注册");
         }
         AppRegister appRegister = new AppRegister(register);
@@ -72,6 +95,7 @@ public class AuthService {
             throw new PasswordNotSetException();
         }
         AppUser appUser = new AppUser(register, verify);
+        appUser.setNewPassword(register.getPassword(), encryptService);
         appUserRepository.save(appUser);
         register.setIsDeleted(true);
         appRegisterRepository.save(register);

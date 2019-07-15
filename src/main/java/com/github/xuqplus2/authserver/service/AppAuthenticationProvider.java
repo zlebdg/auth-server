@@ -1,29 +1,31 @@
 package com.github.xuqplus2.authserver.service;
 
+import com.github.xuqplus2.authserver.domain.AppUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import javax.transaction.Transactional;
+
 @Component
+@Transactional
 public class AppAuthenticationProvider implements AuthenticationProvider {
 
+    @Autowired
+    EncryptService encryptService;
     @Autowired
     AppUserDetailsService appUserDetailsService;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String username = authentication.getName();
-        String password = authentication.getCredentials().toString();
-        UserDetails user = appUserDetailsService.loadUserByUsername(username);
-        if (null == user) {
-            throw new AuthenticationServiceException("用户不存在");
-        }
-        return new UsernamePasswordAuthenticationToken(user, password, user.getAuthorities());
+        Object password = authentication.getCredentials();// 明文密码
+        AppUser appUser = (AppUser) appUserDetailsService.loadUserByUsername(username);
+        appUser.checkPassword(password, encryptService);
+        return new UsernamePasswordAuthenticationToken(appUser, password, appUser.getAuthorities());
     }
 
     @Override

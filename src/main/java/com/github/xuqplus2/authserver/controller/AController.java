@@ -23,9 +23,9 @@ public class AController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return String.format("授权信息: 名称=%s, 信息=%s, 凭据=%s, 权限=%s, ",
                 authentication.getName(),
-                authentication.getPrincipal(),
-                authentication.getCredentials(),
-                authentication.getAuthorities());
+                JSON.toJSONString(authentication.getPrincipal()),
+                JSON.toJSONString(authentication.getCredentials()),
+                JSON.toJSONString(authentication.getAuthorities()));
     }
 
     @GetMapping("userInfo")

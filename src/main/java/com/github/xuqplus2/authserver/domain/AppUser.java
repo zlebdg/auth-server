@@ -1,10 +1,13 @@
 package com.github.xuqplus2.authserver.domain;
 
+import com.github.xuqplus2.authserver.service.EncryptService;
 import com.github.xuqplus2.authserver.util.AuthorityUtil;
+import com.github.xuqplus2.authserver.util.RandomUtil;
 import com.github.xuqplus2.authserver.vo.req.RegisterVerify;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
@@ -19,6 +22,8 @@ import java.util.Set;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class AppUser extends BasicDomain implements UserDetails {
+
+    private static final int PASSWORD_SALT_LENGTH = 16;
 
     @Id
     @Column(length = 64)
@@ -39,7 +44,6 @@ public class AppUser extends BasicDomain implements UserDetails {
     public AppUser(AppRegister register, RegisterVerify verify) {
         this.username = register.getUsername();
         this.email = register.getEmail();
-        this.password = register.getPassword();
         if (StringUtils.isEmpty(this.password)) {
             this.password = verify.getPassword();
         }
@@ -80,5 +84,20 @@ public class AppUser extends BasicDomain implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    /* 加密并设置密码 */
+    public void setNewPassword(String password, EncryptService encryptService) {
+        this.salt = RandomUtil.string(PASSWORD_SALT_LENGTH);
+        this.password = encryptService.encodeAppUserPassword(this.salt + password);
+    }
+
+    /* 检查密码 */
+    public void checkPassword(Object password, EncryptService encryptService) {
+        if (null == this.salt || null == this.password
+                || !this.password.equals(encryptService.encodeAppUserPassword(this.salt + password))) {
+            throw new AuthenticationServiceException("密码不正确");
+//            throw new BadCredentialsException("密码不正确");
+        }
     }
 }

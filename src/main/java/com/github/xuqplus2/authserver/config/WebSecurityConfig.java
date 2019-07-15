@@ -1,5 +1,6 @@
 package com.github.xuqplus2.authserver.config;
 
+import com.github.xuqplus2.authserver.service.AppAuthenticationProvider;
 import com.github.xuqplus2.authserver.service.AppUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +18,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     AppUserDetailsService appUserDetailsService;
+    @Autowired
+    AppAuthenticationProvider appAuthenticationProvider;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -51,16 +54,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable();
     }
 
+    // role会转换成权限ROLE_${role}, 设置了权限时role会被忽略
     @Autowired
     public void configBuilder(AuthenticationManagerBuilder builder) throws Exception {
         final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         builder
                 .inMemoryAuthentication().passwordEncoder(encoder)
-//                 role会转换成权限ROLE_${role}, 设置了权限时role会被忽略
-                .withUser("normal").password(encoder.encode("123456")).roles("normal").authorities("normal2").and()
-                .withUser("admin").password(encoder.encode("123456")).roles("admin").and()
+                .withUser("test").password(encoder.encode("123456")).roles("test").and()
                 .withUser("root").password(encoder.encode("123456")).roles("root");
-        builder.userDetailsService(appUserDetailsService);
+        builder
+                .userDetailsService(appUserDetailsService)
+//                .passwordEncoder(encoder)
+                .and()
+                .authenticationProvider(appAuthenticationProvider);
     }
 
     @Bean
