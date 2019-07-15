@@ -3,10 +3,12 @@ package com.github.xuqplus2.authserver.vo.resp;
 import com.github.xuqplus2.authserver.util.HttpStatusUtil;
 import com.github.xuqplus2.authserver.vo.VO;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class BasicResp extends VO {
 
     private static final BasicResp OK_RESP = new BasicResp(HttpStatus.OK);
@@ -37,12 +39,8 @@ public class BasicResp extends VO {
         return OK;
     }
 
-    /**
-     * 直接用<code>ResponseEntity.ok(data)</code>就好了
-     */
-    @Deprecated
     public static final ResponseEntity ok(Object data) {
-        return ResponseEntity.ok(data);
+        return ResponseEntity.ok(new BasicResp(HttpStatus.OK, HttpStatus.OK.name(), data));
     }
 
     public static final ResponseEntity result(BasicResp resp) {

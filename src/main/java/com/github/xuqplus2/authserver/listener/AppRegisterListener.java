@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.net.URLEncoder;
 
+@Async
 @Component
 @Slf4j
 public class AppRegisterListener implements ApplicationListener<AppRegisterEvent> {
@@ -26,7 +27,6 @@ public class AppRegisterListener implements ApplicationListener<AppRegisterEvent
     MailService mailService;
 
     @Override
-    @Async
     public void onApplicationEvent(AppRegisterEvent event) {
         AppRegister appRegister = (AppRegister) event.getSource();
         log.info("appRegister=>{}", appRegister);

@@ -45,7 +45,7 @@ public class RegisterController {
 
         bindingCheck(bindingResult);
         authService.register(register, text, date);
-        return ResponseEntity.ok(register);
+        return BasicResp.ok(register);
     }
 
     // 参数检查, todo 改写
