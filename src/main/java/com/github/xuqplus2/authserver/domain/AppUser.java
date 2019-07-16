@@ -34,10 +34,10 @@ public class AppUser extends BasicDomain implements UserDetails {
     @Column(nullable = false)
     String password;
     /* cascade 级联操作权限 */
-    @ManyToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER)
     public Set<AppRole> appRoles;
     /* fetch 关联加载, 延迟/立即 */
-    @ManyToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER)
     public Set<AppAuthority> appAuthorities;
 
     public AppUser(AppRegister register, RegisterVerify verify) {
@@ -88,6 +88,6 @@ public class AppUser extends BasicDomain implements UserDetails {
     /* 加密并设置密码 */
     public void setNewPassword(String password, EncryptService encryptService) {
         this.salt = RandomUtil.string(PASSWORD_SALT_LENGTH);
-        this.password = encryptService.encodeAppUserPassword(this.salt + password);
+        this.password = encryptService.encryptAppUserPassword(password);
     }
 }

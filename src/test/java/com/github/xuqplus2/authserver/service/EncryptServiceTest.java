@@ -2,12 +2,10 @@ package com.github.xuqplus2.authserver.service;
 
 import com.github.xuqplus2.authserver.AuthServerApplicationTests;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Slf4j
-@Ignore
 public class EncryptServiceTest extends AuthServerApplicationTests {
 
     @Autowired
@@ -24,5 +22,13 @@ public class EncryptServiceTest extends AuthServerApplicationTests {
 
         input = "1231231231231231231231231231231231312312312312312";
         log.info("output=>{}", encryptService.sha256(input));
+
+        input = "123456";
+        log.info("output=>{}", encryptService.encryptAppUserPassword(input));
+        log.info("output=>{}", encryptService.encryptAppUserPassword(input, "noop"));
+        log.info("output=>{}", encryptService.encryptAppUserPassword(input, "md5"));
+        log.info("output=>{}", encryptService.encryptAppUserPassword(input, "sha256"));
+        log.info("output=>{}", encryptService.encryptAppUserPassword(input, "bcrypt"));
+        log.info("output=>{}", encryptService.encryptAppUserPassword(input, "scrypt"));
     }
 }

@@ -95,7 +95,7 @@ public class AuthService {
             throw new PasswordNotSetException();
         }
         AppUser appUser = new AppUser(register, verify);
-        appUser.setNewPassword(register.getPassword(), encryptService);
+        appUser.setNewPassword(appUser.getPassword(), encryptService);
         appUserRepository.save(appUser);
         register.setIsDeleted(true);
         appRegisterRepository.save(register);
