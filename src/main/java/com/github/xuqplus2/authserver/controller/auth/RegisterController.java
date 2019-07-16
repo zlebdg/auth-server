@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 @RestController
@@ -34,6 +35,7 @@ public class RegisterController {
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity register(
             HttpServletRequest request,
+            HttpSession session,
             @RequestHeader(value = "Host") String host,
 //            @CookieValue("AUTH-SERVER-SESSION-ID") String sessionId, // i.e. 获取cookie值
             @SessionAttribute(Constants.KAPTCHA_SESSION_KEY) String text, // 获取session属性
@@ -46,6 +48,9 @@ public class RegisterController {
 
         bindingCheck(bindingResult);
         authService.register(register, text, date);
+
+        session.removeAttribute(Constants.KAPTCHA_SESSION_KEY);
+        session.removeAttribute(Constants.KAPTCHA_SESSION_DATE);
         return BasicResp.ok(register);
     }
 
@@ -64,11 +69,12 @@ public class RegisterController {
     @PostMapping(produces = {MediaType.TEXT_HTML_VALUE, MediaType.ALL_VALUE})
     public ModelAndView register(
             HttpServletRequest request,
+            HttpSession session,
             @RequestHeader(value = "Host") String host,
             @SessionAttribute(Constants.KAPTCHA_SESSION_KEY) String text,
             @SessionAttribute(Constants.KAPTCHA_SESSION_DATE) Long date,
             @Valid Register register, BindingResult bindingResult, ModelAndView mav) throws RegisterException {
-        ResponseEntity responseEntity = this.register(request, host, text, date, register, bindingResult);
+        ResponseEntity responseEntity = this.register(request, session, host, text, date, register, bindingResult);
         mav.addObject("vo", responseEntity.getBody());
         mav.setViewName("auth/register");
         return mav;

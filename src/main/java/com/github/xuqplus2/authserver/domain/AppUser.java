@@ -23,6 +23,7 @@ import java.util.Set;
 public class AppUser extends BasicDomain implements UserDetails {
 
     private static final int PASSWORD_SALT_LENGTH = 16;
+    public static final String DEFAULT_PASSWORD_ENCRYPT = "app"; // 密码加密方式
 
     @Id
     @Column(length = 64)
@@ -34,10 +35,10 @@ public class AppUser extends BasicDomain implements UserDetails {
     @Column(nullable = false)
     String password;
     /* cascade 级联操作权限 */
-    @ManyToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY)
     public Set<AppRole> appRoles;
     /* fetch 关联加载, 延迟/立即 */
-    @ManyToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY)
     public Set<AppAuthority> appAuthorities;
 
     public AppUser(AppRegister register, RegisterVerify verify) {

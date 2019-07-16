@@ -56,7 +56,7 @@ public class AuthService {
             if (null != appRegister) {
                 // 邮件重发间隔
                 if ((null == appRegister.getUpdateAt() && System.currentTimeMillis() - appRegister.getCreateAt() > REGISTER_EVENT_PUBLISH_INTERVAL)
-                        || System.currentTimeMillis() - appRegister.getUpdateAt() > REGISTER_EVENT_PUBLISH_INTERVAL) {
+                        || (null != appRegister.getUpdateAt() && System.currentTimeMillis() - appRegister.getUpdateAt() > REGISTER_EVENT_PUBLISH_INTERVAL)) {
                     appRegister.refreshVerifyCode();
                     appRegisterRepository.save(appRegister);
                     // 发布事件

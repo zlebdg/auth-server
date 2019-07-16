@@ -1,6 +1,8 @@
 package com.github.xuqplus2.authserver.config;
 
+import com.github.xuqplus2.authserver.service.AppDaoAuthenticationProvider;
 import com.github.xuqplus2.authserver.service.AppUserDetailsService;
+import com.github.xuqplus2.authserver.service.EncryptService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,7 +11,6 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 
 @Configuration
@@ -17,10 +18,13 @@ import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    AppUserDetailsService appUserDetailsService;
+    AppDaoAuthenticationProvider appDaoAuthenticationProvider;
 
     @Autowired
     DelegatingPasswordEncoder delegatingPasswordEncoder;
+
+    @Autowired
+    EncryptService encryptService;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -30,13 +34,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin()
                 .loginProcessingUrl("/login")
                 .loginPage("/login.html") // 重写登录网页
-//                默认操作应当类似
-//                .successHandler((request, response, authentication) -> {
-//                    RequestCache cache = new HttpSessionRequestCache();
-//                    SavedRequest savedRequest = cache.getRequest(request, response);
-//                    String url = savedRequest.getRedirectUrl();
-//                    response.sendRedirect(url);
-//                })
                 .and()
                 .authorizeRequests()
                 .antMatchers("/all",
@@ -58,30 +55,39 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     // role会转换成权限ROLE_${role}, 设置了权限时role会被忽略
     @Autowired
     public void configBuilder(AuthenticationManagerBuilder builder) throws Exception {
-        final BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
-//        final DelegatingPasswordEncoder delegatingPasswordEncoder = (DelegatingPasswordEncoder) PasswordEncoderFactories.createDelegatingPasswordEncoder();
         builder
+//                /**
+//                 * 会将<code>appUserDetailsService</code>注册到
+//                 * <code>ProviderManager</code>的
+//                 * <code>List<AuthenticationProvider> providers</code>的里
+//                 * 实现从数据库读取用户信息
+//                 */
+//                .userDetailsService(appUserDetailsService).passwordEncoder(delegatingPasswordEncoder).and()
                 /**
-                 * 会将<code>appUserDetailsService</code>注册到
-                 * <code>ProviderManager</code>的
-                 * <code>List<AuthenticationProvider> providers</code>的里
-                 * 实现从数据库读取用户信息
+                 * 登录认证实现
                  */
-                .userDetailsService(appUserDetailsService).passwordEncoder(delegatingPasswordEncoder).and()
+                .authenticationProvider(appDaoAuthenticationProvider)
                 /**
                  * 因为<code>ProviderManager</code>的<code>providers</code>是<code>List</code>类型
                  * 所以认证方法的执行是须序有关的
                  * 先设置<code>appUserDetailsService</code>
                  * 从而在登录认证时, 先读取数据库用户信息, 后读取内存用户信息
                  */
-                .inMemoryAuthentication().passwordEncoder(delegatingPasswordEncoder)
-                .withUser("test").password("{bcrypt}" + bcrypt.encode("123456")).roles("test").and()
-                .withUser("root").password("{bcrypt}" + bcrypt.encode("123456")).roles("root");
+                .inMemoryAuthentication()
+                .passwordEncoder(delegatingPasswordEncoder)
+                .withUser("test").password(encryptService.encryptAppUserPassword("123456")).roles("test").and()
+                .withUser("root").password(encryptService.encryptAppUserPassword("123456")).roles("root");
     }
 
     @Bean
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
+    }
+
+    @Bean
+    @Autowired
+    public AppDaoAuthenticationProvider appDaoAuthenticationProvider(AppUserDetailsService appUserDetailsService, DelegatingPasswordEncoder delegatingPasswordEncoder) {
+        return new AppDaoAuthenticationProvider(appUserDetailsService, delegatingPasswordEncoder);
     }
 }

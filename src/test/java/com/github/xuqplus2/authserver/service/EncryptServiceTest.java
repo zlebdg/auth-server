@@ -4,6 +4,7 @@ import com.github.xuqplus2.authserver.AuthServerApplicationTests;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 
 @Slf4j
 public class EncryptServiceTest extends AuthServerApplicationTests {
@@ -30,5 +31,14 @@ public class EncryptServiceTest extends AuthServerApplicationTests {
         log.info("output=>{}", encryptService.encryptAppUserPassword(input, "sha256"));
         log.info("output=>{}", encryptService.encryptAppUserPassword(input, "bcrypt"));
         log.info("output=>{}", encryptService.encryptAppUserPassword(input, "scrypt"));
+    }
+
+    @Autowired
+    DelegatingPasswordEncoder delegatingPasswordEncoder;
+
+    @Test
+    public void a() {
+        String output = delegatingPasswordEncoder.encode("123456");
+        log.info("output=>{}", output);
     }
 }
