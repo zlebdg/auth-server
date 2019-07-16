@@ -7,7 +7,6 @@ import com.github.xuqplus2.authserver.vo.req.RegisterVerify;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
@@ -90,14 +89,5 @@ public class AppUser extends BasicDomain implements UserDetails {
     public void setNewPassword(String password, EncryptService encryptService) {
         this.salt = RandomUtil.string(PASSWORD_SALT_LENGTH);
         this.password = encryptService.encodeAppUserPassword(this.salt + password);
-    }
-
-    /* 检查密码 */
-    public void checkPassword(Object password, EncryptService encryptService) {
-        if (null == this.salt || null == this.password
-                || !this.password.equals(encryptService.encodeAppUserPassword(this.salt + password))) {
-            throw new AuthenticationServiceException("密码不正确");
-//            throw new BadCredentialsException("密码不正确");
-        }
     }
 }

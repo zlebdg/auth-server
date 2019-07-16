@@ -11,6 +11,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @EnableWebSecurity
@@ -57,15 +59,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     // role会转换成权限ROLE_${role}, 设置了权限时role会被忽略
     @Autowired
     public void configBuilder(AuthenticationManagerBuilder builder) throws Exception {
-        final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        builder
-                .inMemoryAuthentication().passwordEncoder(encoder)
-                .withUser("test").password(encoder.encode("123456")).roles("test").and()
-                .withUser("root").password(encoder.encode("123456")).roles("root");
+        final BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
+        final PasswordEncoder delegatingPasswordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
         builder
                 .userDetailsService(appUserDetailsService)
-//                .passwordEncoder(encoder)
                 .and()
+                .inMemoryAuthentication()
+                .passwordEncoder(delegatingPasswordEncoder)
+                .withUser("test").password("{bcrypt}" + bcrypt.encode("123456")).roles("test").and()
+                .withUser("root").password("{bcrypt}" + bcrypt.encode("123456")).roles("root");
+        builder
                 .authenticationProvider(appAuthenticationProvider);
     }
 
