@@ -26,7 +26,7 @@ public class EncryptServiceTest extends AuthServerApplicationTests {
 
         input = "123456";
         log.info("output=>{}", encryptService.encryptAppUserPassword(input));
-        log.info("output=>{}", encryptService.encryptAppUserPassword(input, "noop"));
+//        log.info("output=>{}", encryptService.encryptAppUserPassword(input, "noop"));
         log.info("output=>{}", encryptService.encryptAppUserPassword(input, "md5"));
         log.info("output=>{}", encryptService.encryptAppUserPassword(input, "sha256"));
         log.info("output=>{}", encryptService.encryptAppUserPassword(input, "bcrypt"));
