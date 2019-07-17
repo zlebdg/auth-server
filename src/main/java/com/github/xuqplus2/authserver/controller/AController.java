@@ -20,6 +20,7 @@ public class AController {
 
     @GetMapping("/")
     public String a() {
+        /* private static final ThreadLocal<SecurityContext> contextHolder = new ThreadLocal<>(); // 实现方法 */
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return String.format("授权信息: 名称=%s, 信息=%s, 凭据=%s, 权限=%s, ",
                 authentication.getName(),
