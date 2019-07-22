@@ -1,10 +1,13 @@
 package com.github.xuqplus2.authserver.controller.handler;
 
 import com.github.xuqplus2.authserver.controller.test.TestException;
+import com.github.xuqplus2.authserver.vo.resp.BasicResp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,7 +18,7 @@ import javax.servlet.http.HttpServletResponse;
  * 异常处理中抛出的异常不会再次被自己捕获, 而是在 ErrorController 中处理并返回给 client
  */
 @Slf4j
-//@RestControllerAdvice
+@RestControllerAdvice
 public class AppExceptionHandler {
 
     @ExceptionHandler(value = TestException.class)
@@ -25,6 +28,12 @@ public class AppExceptionHandler {
 //        if (true) throw new TestException("此异常不会再次被 @ControllerAdvice 给捕获到");
 //        if (true) throw new RuntimeException("此异常不会再次被 @ControllerAdvice 给捕获到");
         return new ResponseEntity("error", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(value = BadCredentialsException.class)
+    public ResponseEntity handle(HttpServletRequest request, HttpServletResponse response, BadCredentialsException e) {
+        log.error("e.message={}", e.getMessage());
+        return BasicResp.err(HttpStatus.UNAUTHORIZED, e.getMessage(), null);
     }
 
     @ExceptionHandler(value = RuntimeException.class)

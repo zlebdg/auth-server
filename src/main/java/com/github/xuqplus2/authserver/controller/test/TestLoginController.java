@@ -3,11 +3,9 @@ package com.github.xuqplus2.authserver.controller.test;
 import com.github.xuqplus2.authserver.vo.req.Login;
 import com.github.xuqplus2.authserver.vo.resp.BasicResp;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
@@ -36,15 +34,9 @@ public class TestLoginController {
         HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
         WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(request.getServletContext());
         AuthenticationManager authenticationManager = webApplicationContext.getBean(AuthenticationManager.class);
-        try {
-            Authentication token = authenticationManager.authenticate(login.getAuthentication());
-            SecurityContextHolder.getContext().setAuthentication(token);
-            return BasicResp.ok(token);
-        } catch (BadCredentialsException e) { // todo, 改写
-            if (MediaType.APPLICATION_JSON_VALUE.equals(request.getHeader("accept")))
-                return BasicResp.err(HttpStatus.UNAUTHORIZED, e.getMessage(), null);
-            throw e;
-        }
+        Authentication token = authenticationManager.authenticate(login.getAuthentication());
+        SecurityContextHolder.getContext().setAuthentication(token);
+        return BasicResp.ok(token);
     }
 
     @PostMapping(produces = {MediaType.TEXT_HTML_VALUE})
