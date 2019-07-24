@@ -1,16 +1,24 @@
 package com.github.xuqplus2.authserver.controller.handler;
 
-import com.github.xuqplus2.authserver.controller.test.TestException;
 import com.github.xuqplus2.authserver.vo.resp.BasicResp;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.web.servlet.error.AbstractErrorController;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.HttpMediaTypeNotAcceptableException;
+import org.springframework.web.accept.ContentNegotiationManager;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.context.request.ServletWebRequest;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * 全局异常处理
@@ -19,45 +27,69 @@ import javax.servlet.http.HttpServletResponse;
  */
 @Slf4j
 @RestControllerAdvice
-public class AppExceptionHandler {
+public class AppExceptionHandler { // 捕获 Controller 内的异常
 
-    @ExceptionHandler(value = TestException.class)
-    public ResponseEntity handle(HttpServletRequest request, HttpServletResponse response, TestException e) {
-        log.error("e.message={}", e.getMessage());
-        /* 异常处理器中不要再抛出异常 */
-//        if (true) throw new TestException("此异常不会再次被 @ControllerAdvice 给捕获到");
-//        if (true) throw new RuntimeException("此异常不会再次被 @ControllerAdvice 给捕获到");
-        return new ResponseEntity("error", HttpStatus.INTERNAL_SERVER_ERROR);
+    @Autowired
+    ContentNegotiationManager contentNegotiationManager;
+
+    private ResponseEntity handleJson(HttpServletRequest request, String message) {
+        return BasicResp.err(getStatus(request), message, null);
     }
 
+    private ModelAndView handleHtml(HttpServletRequest request, String message) {
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("vo", handleJson(request, message).getBody());
+        mav.setViewName("error");
+        return mav;
+    }
+
+    private Object handle(String message) throws HttpMediaTypeNotAcceptableException {
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = requestAttributes.getRequest();
+        List<MediaType> mediaTypes = contentNegotiationManager.resolveMediaTypes(new ServletWebRequest(request));
+        if (mediaTypes.contains(MediaType.APPLICATION_JSON)) {
+            return handleJson(request, message);
+        }
+        return handleHtml(request, message);
+    }
+
+    /**
+     * 特定的异常可以做特殊处理
+     *
+     * @param e
+     * @return
+     */
     @ExceptionHandler(value = BadCredentialsException.class)
-    public ResponseEntity handle(HttpServletRequest request, HttpServletResponse response, BadCredentialsException e) {
+    public Object handle(BadCredentialsException e) {
         log.error("e.message={}", e.getMessage());
         return BasicResp.err(HttpStatus.UNAUTHORIZED, e.getMessage(), null);
     }
 
-    @ExceptionHandler(value = RuntimeException.class)
-    public ResponseEntity handle(HttpServletRequest request, HttpServletResponse response, RuntimeException e) {
-        log.error("e.message={}", e.getMessage());
-        throw e;
-//        return new ResponseEntity("error", HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @ExceptionHandler(value = Exception.class)
-    public ResponseEntity handle(HttpServletRequest request, HttpServletResponse response, Exception e) {
-        log.error("e.message={}", e.getMessage());
-        return new ResponseEntity("error", HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
+    /**
+     * 简单起见
+     *
+     * @param t
+     * @return
+     * @throws HttpMediaTypeNotAcceptableException
+     */
     @ExceptionHandler(value = Throwable.class)
-    public ResponseEntity handle(HttpServletRequest request, HttpServletResponse response, Throwable t) {
+    public Object handle(Throwable t) throws HttpMediaTypeNotAcceptableException {
         log.error("t.message={}", t.getMessage());
-        return new ResponseEntity("error", HttpStatus.INTERNAL_SERVER_ERROR);
+        return handle(t.getMessage());
     }
 
-    @ExceptionHandler(value = Error.class)
-    public ResponseEntity handle(HttpServletRequest request, HttpServletResponse response, Error e) {
-        log.error("e.message={}", e.getMessage());
-        return new ResponseEntity("error", HttpStatus.INTERNAL_SERVER_ERROR);
+    /**
+     * copied from {@link AbstractErrorController}
+     */
+    protected HttpStatus getStatus(HttpServletRequest request) {
+        Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
+        if (statusCode == null) {
+            return HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+        try {
+            return HttpStatus.valueOf(statusCode);
+        } catch (Exception ex) {
+            return HttpStatus.INTERNAL_SERVER_ERROR;
+        }
     }
 }

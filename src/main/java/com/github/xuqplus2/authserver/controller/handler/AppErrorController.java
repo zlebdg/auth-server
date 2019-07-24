@@ -16,7 +16,6 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Collections;
 import java.util.Map;
 
@@ -31,10 +30,10 @@ import static com.github.xuqplus2.authserver.controller.handler.AppErrorControll
  */
 @RestController
 @RequestMapping(ERROR_PATH) // needed do not change, todo, to be known, 否则不能正常返回404错误
-public class AppErrorController implements ErrorController {
+public class AppErrorController implements ErrorController { // 捕获 spring 的异常, 如404
 
     public static final String ERROR_PATH = "/error"; // do not change
-    public static final boolean INCLUDE_STACK_TRACE = false; // 不需要把错误信息打印到前端
+    public static final boolean INCLUDE_STACK_TRACE = false; // 不需要把错误栈打印到前端
 
     @Value("${server.error.path:${error.path:/error}}")
     String aaa;
@@ -47,18 +46,8 @@ public class AppErrorController implements ErrorController {
         return ERROR_PATH;
     }
 
-    /* text/html */
-    @RequestMapping(produces = MediaType.TEXT_HTML_VALUE)
-    public ModelAndView errorHtml(ModelAndView mav, HttpServletRequest request, HttpServletResponse response) {
-        ResponseEntity responseEntity = this.jsonError(request, response);
-        mav.addObject("vo", responseEntity.getBody());
-        mav.setViewName("error");
-        return mav;
-    }
-
-    /* application/json */
     @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity jsonError(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity jsonError(HttpServletRequest request) {
         Map<String, Object> attributes = Collections.unmodifiableMap(
                 this.errorAttributes.getErrorAttributes(new ServletWebRequest(request), INCLUDE_STACK_TRACE));
         //        Throwable error = this.errorAttributes.getError(new ServletWebRequest(request));
@@ -66,10 +55,12 @@ public class AppErrorController implements ErrorController {
         return BasicResp.err(getStatus(request), message, attributes);
     }
 
-    /* */
     @RequestMapping
-    public ResponseEntity allError(HttpServletRequest request, HttpServletResponse response) {
-        return this.jsonError(request, response);
+    public ModelAndView otherError(HttpServletRequest request, ModelAndView mav) {
+        ResponseEntity responseEntity = this.jsonError(request);
+        mav.addObject("vo", responseEntity.getBody());
+        mav.setViewName("error");
+        return mav;
     }
 
     /**
