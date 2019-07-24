@@ -35,14 +35,20 @@ public class RegisterController {
      */
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity register(
-            @RequestHeader(value = "Host") String host,
+//            @RequestHeader(value = "Host") String host,
 //            @CookieValue("AUTH-SERVER-SESSION-ID") String sessionId, // i.e. 获取cookie值
             @SessionAttribute(Constants.KAPTCHA_SESSION_KEY) String text, // 获取session属性
             @SessionAttribute(Constants.KAPTCHA_SESSION_DATE) Long date,
             @Valid Register register, BindingResult bindingResult) throws RegisterException {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 
-        register.setVerifyUri(String.format("%s://%s/auth/register/verify", request.getScheme(), host));
+//        String host = request.getHeader("host"); // host = dev.local:16000 // 跟 nginx 的 server_name 有关
+        String origin = request.getHeader("origin"); // http://192.168.124.95:16000
+//        if (!StringUtils.isEmpty(origin)) host = origin;
+//        String xForwardedFor = request.getHeader("x-forwarded-for"); // x-forwarded-for = 192.168.124.95
+//        if (!StringUtils.isEmpty(xForwardedFor)) host = xForwardedFor;
+
+        register.setVerifyUri(String.format("%s/auth/register/verify", origin));
 
         log.info("{}={}, {}={}", Constants.KAPTCHA_SESSION_KEY, text, Constants.KAPTCHA_SESSION_DATE, date);
         log.info("register={}", register);
@@ -69,11 +75,10 @@ public class RegisterController {
      */
     @PostMapping(produces = {MediaType.TEXT_HTML_VALUE, MediaType.ALL_VALUE})
     public ModelAndView register(
-            @RequestHeader(value = "Host") String host,
             @SessionAttribute(Constants.KAPTCHA_SESSION_KEY) String text,
             @SessionAttribute(Constants.KAPTCHA_SESSION_DATE) Long date,
             @Valid Register register, BindingResult bindingResult, ModelAndView mav) throws RegisterException {
-        ResponseEntity responseEntity = this.register(host, text, date, register, bindingResult);
+        ResponseEntity responseEntity = this.register(text, date, register, bindingResult);
         mav.addObject("vo", responseEntity.getBody());
         mav.setViewName("auth/register");
         return mav;
