@@ -50,8 +50,14 @@ public class AppErrorController implements ErrorController { // 捕获 spring �
     public ResponseEntity jsonError(HttpServletRequest request) {
         Map<String, Object> attributes = Collections.unmodifiableMap(
                 this.errorAttributes.getErrorAttributes(new ServletWebRequest(request), INCLUDE_STACK_TRACE));
-        //        Throwable error = this.errorAttributes.getError(new ServletWebRequest(request));
         String message = (String) attributes.get("message");
+        // 遇到无意义的错误提示信息时再做一次尝试拿到有效的message
+        if ("No message available".equals(message)) {
+            Object error = attributes.get("error");
+            if (null != error && error instanceof String) {
+                message = (String) error;
+            }
+        }
         return BasicResp.err(getStatus(request), message, attributes);
     }
 
