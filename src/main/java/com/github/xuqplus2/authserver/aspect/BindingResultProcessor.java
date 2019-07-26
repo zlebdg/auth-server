@@ -54,9 +54,11 @@ public class BindingResultProcessor {
                 BindingResult bindingResult = (BindingResult) arg;
                 if (null != bindingResult && bindingResult.hasErrors()) {
                     FieldError fieldError = bindingResult.getFieldError();
-                    String fieldErrorMessage = String.format("object [%s]'s field [%s] %s", fieldError.getObjectName(), fieldError.getField(), fieldError.getDefaultMessage());
+                    String fieldErrorMessage = String.format("object [%s]'s field [%s] %s",
+                            fieldError.getObjectName(), fieldError.getField(), fieldError.getDefaultMessage());
                     throw new RuntimeException(fieldErrorMessage);
                 }
+                return;
             }
         }
     }

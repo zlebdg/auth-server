@@ -9,7 +9,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,7 +29,6 @@ public class TestLoginController {
 
     @PostMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity login(@Valid Login login, BindingResult bindingResult) {
-        bindingCheck(bindingResult);
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
         WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(request.getServletContext());
@@ -41,18 +39,10 @@ public class TestLoginController {
     }
 
     @PostMapping(produces = {MediaType.TEXT_HTML_VALUE})
-    public ModelAndView login(Login login, BindingResult bindingResult, ModelAndView mav) {
+    public ModelAndView login(@Valid Login login, BindingResult bindingResult, ModelAndView mav) {
         ResponseEntity responseEntity = this.login(login, bindingResult);
         mav.addObject("vo", responseEntity.getBody());
         mav.setViewName("ok");
         return mav;
-    }
-
-    // 参数检查, todo 改写
-    private void bindingCheck(BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            FieldError fieldError = bindingResult.getFieldError();
-            throw new RuntimeException(String.format("object [%s]'s field [%s] %s", fieldError.getObjectName(), fieldError.getField(), fieldError.getDefaultMessage()));
-        }
     }
 }
