@@ -6,6 +6,7 @@ import com.github.xuqplus2.authserver.exception.VerifiedException;
 import com.github.xuqplus2.authserver.service.AuthService;
 import com.github.xuqplus2.authserver.vo.req.Register;
 import com.github.xuqplus2.authserver.vo.req.RegisterVerify;
+import com.github.xuqplus2.authserver.vo.req.register.ResendEmail;
 import com.github.xuqplus2.authserver.vo.resp.BasicResp;
 import com.google.code.kaptcha.Constants;
 import lombok.extern.slf4j.Slf4j;
@@ -77,7 +78,7 @@ public class RegisterController {
     /**
      * 验证
      */
-    @GetMapping(value = "verify", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "verify", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity verify(@Valid RegisterVerify verify, BindingResult bindingResult) throws RegisterException, PasswordNotSetException, VerifiedException {
         log.info("verify", verify);
         authService.verify(verify);
@@ -97,5 +98,15 @@ public class RegisterController {
             mav.setViewName("auth/verify/verified");
             return mav;
         }
+    }
+
+    /**
+     * 重发邮件
+     */
+    @PostMapping(value = "resendEmail", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity resendEmail(@Valid ResendEmail resendEmail, BindingResult bindingResult) throws RegisterException {
+        log.info("resendEmail", resendEmail);
+        authService.resendEmail(resendEmail);
+        return BasicResp.ok();
     }
 }

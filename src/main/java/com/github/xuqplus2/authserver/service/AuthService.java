@@ -10,6 +10,7 @@ import com.github.xuqplus2.authserver.repository.AppRegisterRepository;
 import com.github.xuqplus2.authserver.repository.AppUserRepository;
 import com.github.xuqplus2.authserver.vo.req.Register;
 import com.github.xuqplus2.authserver.vo.req.RegisterVerify;
+import com.github.xuqplus2.authserver.vo.req.register.ResendEmail;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -50,23 +51,6 @@ public class AuthService {
         if (appUserRepository.existsByEmail(register.getEmail())) {
             throw new RegisterException("邮箱已经注册");
         }
-        /* 重发邮件 */
-        if (register.isResendEmail()) {
-            AppRegister appRegister = appRegisterRepository.getByUsernameAndEmailAndIsDeletedFalse(register.getUsername(), register.getEmail());
-            if (null != appRegister) {
-                // 邮件重发间隔
-                if ((null == appRegister.getUpdateAt() && System.currentTimeMillis() - appRegister.getCreateAt() > REGISTER_EVENT_PUBLISH_INTERVAL)
-                        || (null != appRegister.getUpdateAt() && System.currentTimeMillis() - appRegister.getUpdateAt() > REGISTER_EVENT_PUBLISH_INTERVAL)) {
-                    appRegister.refreshVerifyCode();
-                    appRegisterRepository.save(appRegister);
-                    // 发布事件
-                    eventPublisher.publishEvent(new AppRegisterEvent(appRegister));
-                    return;
-                } else {
-                    throw new RegisterException("未满足邮件重发间隔");
-                }
-            }
-        }
         if (appRegisterRepository.existsByUsername(register.getUsername())) {
             throw new RegisterException("用户名已经注册");
         }
@@ -100,5 +84,23 @@ public class AuthService {
         register.setIsDeleted(true);
         appRegisterRepository.save(register);
         log.info("注册完成, username=>{}", appUser.getUsername());
+    }
+
+    public void resendEmail(ResendEmail resendEmail) throws RegisterException {
+        AppRegister appRegister = appRegisterRepository.getByUsernameAndEmailAndIsDeletedFalse(resendEmail.getUsername(), resendEmail.getEmail());
+        if (null != appRegister) {
+            // 邮件重发间隔
+            if ((null == appRegister.getUpdateAt() && System.currentTimeMillis() - appRegister.getCreateAt() > REGISTER_EVENT_PUBLISH_INTERVAL)
+                    || (null != appRegister.getUpdateAt() && System.currentTimeMillis() - appRegister.getUpdateAt() > REGISTER_EVENT_PUBLISH_INTERVAL)) {
+                appRegister.refreshVerifyCode();
+                appRegisterRepository.save(appRegister);
+                // 发布事件
+                eventPublisher.publishEvent(new AppRegisterEvent(appRegister));
+                return;
+            } else {
+                throw new RegisterException("未满足邮件重发间隔");
+            }
+        }
+        throw new RegisterException("注册信息不存在");
     }
 }
