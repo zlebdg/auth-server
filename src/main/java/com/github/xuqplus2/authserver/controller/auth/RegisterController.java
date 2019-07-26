@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -53,20 +52,11 @@ public class RegisterController {
         log.info("{}={}, {}={}", Constants.KAPTCHA_SESSION_KEY, text, Constants.KAPTCHA_SESSION_DATE, date);
         log.info("register={}", register);
 
-        bindingCheck(bindingResult);
         authService.register(register, text, date);
 
         request.getSession().removeAttribute(Constants.KAPTCHA_SESSION_KEY);
         request.getSession().removeAttribute(Constants.KAPTCHA_SESSION_DATE);
         return BasicResp.ok(register);
-    }
-
-    // 参数检查, todo 改写
-    private void bindingCheck(BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            FieldError fieldError = bindingResult.getFieldError();
-            throw new RuntimeException(String.format("object [%s]'s field [%s] %s", fieldError.getObjectName(), fieldError.getField(), fieldError.getDefaultMessage()));
-        }
     }
 
     /**
@@ -90,7 +80,6 @@ public class RegisterController {
     @GetMapping(value = "verify", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity verify(@Valid RegisterVerify verify, BindingResult bindingResult) throws RegisterException, PasswordNotSetException, VerifiedException {
         log.info("verify", verify);
-        bindingCheck(bindingResult);
         authService.verify(verify);
         return BasicResp.ok();
     }
