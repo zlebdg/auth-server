@@ -21,6 +21,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("test/login")
@@ -28,7 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 public class TestLoginController {
 
     @PostMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity login(Login login, BindingResult bindingResult) {
+    public ResponseEntity login(@Valid Login login, BindingResult bindingResult) {
         bindingCheck(bindingResult);
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
