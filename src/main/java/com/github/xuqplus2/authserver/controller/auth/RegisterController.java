@@ -3,7 +3,6 @@ package com.github.xuqplus2.authserver.controller.auth;
 import com.github.xuqplus2.authserver.exception.CaptchaException;
 import com.github.xuqplus2.authserver.exception.PasswordNotSetException;
 import com.github.xuqplus2.authserver.exception.RegisterException;
-import com.github.xuqplus2.authserver.exception.VerifiedException;
 import com.github.xuqplus2.authserver.service.AppCaptchaService;
 import com.github.xuqplus2.authserver.service.AuthService;
 import com.github.xuqplus2.authserver.vo.req.auth.register.Register;
@@ -78,7 +77,7 @@ public class RegisterController {
      * 验证
      */
     @PostMapping(value = "verify", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity verify(@Valid RegisterVerify verify, BindingResult bindingResult) throws RegisterException, PasswordNotSetException, VerifiedException {
+    public ResponseEntity verify(@Valid RegisterVerify verify, BindingResult bindingResult) throws RegisterException, PasswordNotSetException {
         log.info("verify={}", verify);
         authService.registerVerify(verify);
         return BasicResp.ok();
@@ -92,9 +91,6 @@ public class RegisterController {
             return mav;
         } catch (PasswordNotSetException e) {
             mav.setViewName("auth/verify/setPassword");
-            return mav;
-        } catch (VerifiedException e) {
-            mav.setViewName("auth/verify/verified");
             return mav;
         }
     }

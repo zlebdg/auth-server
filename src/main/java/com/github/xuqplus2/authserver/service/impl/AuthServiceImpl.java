@@ -5,7 +5,6 @@ import com.github.xuqplus2.authserver.domain.AppUser;
 import com.github.xuqplus2.authserver.exception.PassswordResetException;
 import com.github.xuqplus2.authserver.exception.PasswordNotSetException;
 import com.github.xuqplus2.authserver.exception.RegisterException;
-import com.github.xuqplus2.authserver.exception.VerifiedException;
 import com.github.xuqplus2.authserver.listener.AppRegisterEvent;
 import com.github.xuqplus2.authserver.repository.AppRegisterRepository;
 import com.github.xuqplus2.authserver.repository.AppUserRepository;
@@ -59,13 +58,16 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Transactional
-    public void registerVerify(RegisterVerify verify) throws RegisterException, PasswordNotSetException, VerifiedException {
+    public void registerVerify(RegisterVerify verify) throws RegisterException, PasswordNotSetException {
+        if (appUserRepository.existsByUsername(verify.getUsername())) {
+            return;
+        }
         AppRegister register = appRegisterRepository.getByUsername(verify.getUsername());
         if (null == register) {
             throw new RegisterException("没有查到注册信息");
         }
         if (register.getIsDeleted()) {
-            throw new VerifiedException();
+            throw new RegisterException("注册信息过期");
         }
         if (!verify.getVerifyCode().equalsIgnoreCase(register.getVerifyCode())) {
             throw new RegisterException("验证失败");

@@ -3,7 +3,6 @@ package com.github.xuqplus2.authserver.service;
 import com.github.xuqplus2.authserver.exception.PassswordResetException;
 import com.github.xuqplus2.authserver.exception.PasswordNotSetException;
 import com.github.xuqplus2.authserver.exception.RegisterException;
-import com.github.xuqplus2.authserver.exception.VerifiedException;
 import com.github.xuqplus2.authserver.vo.req.auth.register.Register;
 import com.github.xuqplus2.authserver.vo.req.auth.register.RegisterVerify;
 import com.github.xuqplus2.authserver.vo.req.auth.register.ResendEmail;
@@ -15,7 +14,7 @@ public interface AuthService {
 
     void register(Register register) throws RegisterException;
 
-    void registerVerify(RegisterVerify verify) throws RegisterException, PasswordNotSetException, VerifiedException;
+    void registerVerify(RegisterVerify verify) throws RegisterException, PasswordNotSetException;
 
     void registerResendEmail(ResendEmail resendEmail) throws RegisterException;
 
