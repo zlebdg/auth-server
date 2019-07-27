@@ -1,6 +1,7 @@
-package com.github.xuqplus2.authserver.vo.req;
+package com.github.xuqplus2.authserver.vo.req.auth.register;
 
 import com.github.xuqplus2.authserver.vo.VO;
+import com.github.xuqplus2.authserver.vo.req.auth.register.Register;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

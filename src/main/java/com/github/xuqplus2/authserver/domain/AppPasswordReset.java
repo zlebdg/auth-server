@@ -14,7 +14,7 @@ import javax.persistence.Id;
 @Entity
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class AppRegister extends BasicDomain {
+public class AppPasswordReset extends BasicDomain {
 
     private static final int VERIFY_CODE_LENGTH = 64;
 
@@ -29,7 +29,7 @@ public class AppRegister extends BasicDomain {
     String password;
     String verifyUri;
 
-    public AppRegister(Register register) {
+    public AppPasswordReset(Register register) {
         this.username = register.getUsername();
         this.email = register.getEmail();
         this.verifyCode = RandomUtil.string(VERIFY_CODE_LENGTH);

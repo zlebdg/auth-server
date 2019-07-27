@@ -3,7 +3,7 @@ package com.github.xuqplus2.authserver.domain;
 import com.github.xuqplus2.authserver.service.EncryptService;
 import com.github.xuqplus2.authserver.util.AuthorityUtil;
 import com.github.xuqplus2.authserver.util.RandomUtil;
-import com.github.xuqplus2.authserver.vo.req.RegisterVerify;
+import com.github.xuqplus2.authserver.vo.req.auth.register.RegisterVerify;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;

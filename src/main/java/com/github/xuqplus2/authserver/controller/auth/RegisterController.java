@@ -1,20 +1,25 @@
 package com.github.xuqplus2.authserver.controller.auth;
 
+import com.github.xuqplus2.authserver.exception.CaptchaException;
 import com.github.xuqplus2.authserver.exception.PasswordNotSetException;
 import com.github.xuqplus2.authserver.exception.RegisterException;
 import com.github.xuqplus2.authserver.exception.VerifiedException;
+import com.github.xuqplus2.authserver.service.AppCaptchaService;
 import com.github.xuqplus2.authserver.service.AuthService;
-import com.github.xuqplus2.authserver.vo.req.Register;
-import com.github.xuqplus2.authserver.vo.req.RegisterVerify;
-import com.github.xuqplus2.authserver.vo.req.register.ResendEmail;
+import com.github.xuqplus2.authserver.vo.req.auth.register.Register;
+import com.github.xuqplus2.authserver.vo.req.auth.register.RegisterVerify;
+import com.github.xuqplus2.authserver.vo.req.auth.register.ResendEmail;
 import com.github.xuqplus2.authserver.vo.resp.BasicResp;
-import com.google.code.kaptcha.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.ModelAndView;
@@ -30,33 +35,30 @@ public class RegisterController {
     @Autowired
     AuthService authService;
 
+    @Autowired
+    AppCaptchaService appCaptchaService;
+
     /**
      * Accept: application/json
      */
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity register(
-//            @RequestHeader(value = "Host") String host,
-//            @CookieValue("AUTH-SERVER-SESSION-ID") String sessionId, // i.e. 获取cookie值
-            @SessionAttribute(Constants.KAPTCHA_SESSION_KEY) String text, // 获取session属性
-            @SessionAttribute(Constants.KAPTCHA_SESSION_DATE) Long date,
-            @Valid Register register, BindingResult bindingResult) throws RegisterException {
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+    public ResponseEntity register(@Valid Register register, BindingResult bindingResult) throws RegisterException, CaptchaException {
+        // verifyUri被当做一个隐含的参数
+        if (StringUtils.isEmpty(register.getVerifyUri())) {
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+            String origin = request.getHeader("origin"); // http://192.168.124.95:16000
+            register.setVerifyUri(String.format("%s/auth/register/verify", origin));
+            log.info("setVerifyUri origin={}", origin);
 
-//        String host = request.getHeader("host"); // host = dev.local:16000 // 跟 nginx 的 server_name 有关
-        String origin = request.getHeader("origin"); // http://192.168.124.95:16000
-//        if (!StringUtils.isEmpty(origin)) host = origin;
-//        String xForwardedFor = request.getHeader("x-forwarded-for"); // x-forwarded-for = 192.168.124.95
-//        if (!StringUtils.isEmpty(xForwardedFor)) host = xForwardedFor;
+//            String host = request.getHeader("host"); // host = dev.local:16000 // 跟 nginx 的 server_name 有关
+//            if (!StringUtils.isEmpty(origin)) host = origin;
+//            String xForwardedFor = request.getHeader("x-forwarded-for"); // x-forwarded-for = 192.168.124.95
+//            if (!StringUtils.isEmpty(xForwardedFor)) host = xForwardedFor;
+        }
 
-        register.setVerifyUri(String.format("%s/auth/register/verify", origin));
-
-        log.info("{}={}, {}={}", Constants.KAPTCHA_SESSION_KEY, text, Constants.KAPTCHA_SESSION_DATE, date);
         log.info("register={}", register);
-
-        authService.register(register, text, date);
-
-        request.getSession().removeAttribute(Constants.KAPTCHA_SESSION_KEY);
-        request.getSession().removeAttribute(Constants.KAPTCHA_SESSION_DATE);
+        appCaptchaService.check(register.getCaptcha());
+        authService.register(register);
         return BasicResp.ok(register);
     }
 
@@ -65,11 +67,8 @@ public class RegisterController {
      * 天然的多出一个参数, 正好重载 {@link ModelAndView}
      */
     @PostMapping(produces = {MediaType.TEXT_HTML_VALUE, MediaType.ALL_VALUE})
-    public ModelAndView register(
-            @SessionAttribute(Constants.KAPTCHA_SESSION_KEY) String text,
-            @SessionAttribute(Constants.KAPTCHA_SESSION_DATE) Long date,
-            @Valid Register register, BindingResult bindingResult, ModelAndView mav) throws RegisterException {
-        ResponseEntity responseEntity = this.register(text, date, register, bindingResult);
+    public ModelAndView register(@Valid Register register, BindingResult bindingResult, ModelAndView mav) throws RegisterException, CaptchaException {
+        ResponseEntity responseEntity = this.register(register, bindingResult);
         mav.addObject("vo", responseEntity.getBody());
         mav.setViewName("auth/register");
         return mav;
@@ -80,8 +79,8 @@ public class RegisterController {
      */
     @PostMapping(value = "verify", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity verify(@Valid RegisterVerify verify, BindingResult bindingResult) throws RegisterException, PasswordNotSetException, VerifiedException {
-        log.info("verify", verify);
-        authService.verify(verify);
+        log.info("verify={}", verify);
+        authService.registerVerify(verify);
         return BasicResp.ok();
     }
 
@@ -104,9 +103,9 @@ public class RegisterController {
      * 重发邮件
      */
     @PostMapping(value = "resendEmail", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity resendEmail(@Valid ResendEmail resendEmail, BindingResult bindingResult) throws RegisterException {
+    public ResponseEntity registerResendEmail(@Valid ResendEmail resendEmail, BindingResult bindingResult) throws RegisterException {
         log.info("resendEmail", resendEmail);
-        authService.resendEmail(resendEmail);
+        authService.registerResendEmail(resendEmail);
         return BasicResp.ok();
     }
 }

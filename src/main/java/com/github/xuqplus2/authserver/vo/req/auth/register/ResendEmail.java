@@ -1,4 +1,4 @@
-package com.github.xuqplus2.authserver.vo.req.register;
+package com.github.xuqplus2.authserver.vo.req.auth.register;
 
 import com.github.xuqplus2.authserver.vo.VO;
 import lombok.Data;
