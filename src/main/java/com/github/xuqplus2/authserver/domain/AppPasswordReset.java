@@ -1,7 +1,7 @@
 package com.github.xuqplus2.authserver.domain;
 
 import com.github.xuqplus2.authserver.util.RandomUtil;
-import com.github.xuqplus2.authserver.vo.req.auth.register.Register;
+import com.github.xuqplus2.authserver.vo.req.auth.reset.PasswordReset;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -24,16 +24,13 @@ public class AppPasswordReset extends BasicDomain {
     @Column(nullable = false, unique = true, length = 255)
     String email;
     String verifyCode;
-    @Column(length = 16)
-    String salt;
-    String password;
     String verifyUri;
 
-    public AppPasswordReset(Register register) {
-        this.username = register.getUsername();
-        this.email = register.getEmail();
+    public AppPasswordReset(PasswordReset reset) {
+        this.username = reset.getUsername();
+        this.email = reset.getEmail();
         this.verifyCode = RandomUtil.string(VERIFY_CODE_LENGTH);
-        this.verifyUri = register.getVerifyUri();
+        this.verifyUri = reset.getVerifyUri();
     }
 
     public void refreshVerifyCode() {

@@ -1,11 +1,14 @@
 package com.github.xuqplus2.authserver.service.impl;
 
+import com.github.xuqplus2.authserver.domain.AppPasswordReset;
 import com.github.xuqplus2.authserver.domain.AppRegister;
 import com.github.xuqplus2.authserver.domain.AppUser;
 import com.github.xuqplus2.authserver.exception.PassswordResetException;
 import com.github.xuqplus2.authserver.exception.PasswordNotSetException;
 import com.github.xuqplus2.authserver.exception.RegisterException;
+import com.github.xuqplus2.authserver.listener.AppPasswordResetEvent;
 import com.github.xuqplus2.authserver.listener.AppRegisterEvent;
+import com.github.xuqplus2.authserver.repository.AppPasswordResetRepository;
 import com.github.xuqplus2.authserver.repository.AppRegisterRepository;
 import com.github.xuqplus2.authserver.repository.AppUserRepository;
 import com.github.xuqplus2.authserver.service.AuthService;
@@ -13,7 +16,8 @@ import com.github.xuqplus2.authserver.service.EncryptService;
 import com.github.xuqplus2.authserver.vo.req.auth.register.Register;
 import com.github.xuqplus2.authserver.vo.req.auth.register.RegisterVerify;
 import com.github.xuqplus2.authserver.vo.req.auth.register.ResendEmail;
-import com.github.xuqplus2.authserver.vo.req.auth.reset.PassswordReset;
+import com.github.xuqplus2.authserver.vo.req.auth.reset.PasswordReset;
+import com.github.xuqplus2.authserver.vo.req.auth.reset.PasswordResetVerify;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -31,6 +35,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     AppRegisterRepository appRegisterRepository;
+
+    @Autowired
+    AppPasswordResetRepository appPasswordResetRepository;
 
     @Autowired
     EncryptService encryptService;
@@ -102,7 +109,57 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void reset(PassswordReset reset) throws PassswordResetException {
+    public void reset(PasswordReset reset) throws PassswordResetException {
+        if (!StringUtils.isEmpty(reset.getEmail())) {
+            AppUser user = appUserRepository.getByEmail(reset.getEmail());
+            if (null == user) {
+                throw new PassswordResetException("邮箱不存在");
+            }
+            reset.setUsername(user.getUsername());
+            AppPasswordReset passwordReset = new AppPasswordReset(reset);
+            appPasswordResetRepository.save(passwordReset);
+            AppPasswordResetEvent event = new AppPasswordResetEvent(passwordReset);
+            // 发布重置密码事件
+            eventPublisher.publishEvent(event);
+            return;
+        }
+        if (!StringUtils.isEmpty(reset.getUsername())) {
+            AppUser user = appUserRepository.getByUsername(reset.getUsername());
+            if (null == user) {
+                throw new PassswordResetException("用户名不存在");
+            }
+            reset.setEmail(user.getEmail());
+            AppPasswordReset passwordReset = new AppPasswordReset(reset);
+            appPasswordResetRepository.save(passwordReset);
+            AppPasswordResetEvent event = new AppPasswordResetEvent(passwordReset);
+            // 发布重置密码事件
+            eventPublisher.publishEvent(event);
+            return;
+        }
+        throw new PassswordResetException("密码重置失败, 没有查到账号");
+    }
 
+    @Override
+    @Transactional
+    public void resetVerify(PasswordResetVerify verify) throws PassswordResetException {
+        AppPasswordReset reset = appPasswordResetRepository.getByUsername(verify.getUsername());
+        if (null == reset) {
+            throw new PassswordResetException("没有密码重置申请记录");
+        }
+        if (reset.getIsDeleted()) {
+            return; // 幂等处理
+        }
+        if (StringUtils.isEmpty(verify.getPassword())) {
+            throw new PassswordResetException("缺少[password]参数");
+        }
+        if (reset.getVerifyCode().equals(verify.getVerifyCode())) {
+            AppUser user = appUserRepository.getByUsername(verify.getUsername());
+            user.setNewPassword(verify.getPassword(), encryptService);
+            appUserRepository.save(user);
+            reset.setIsDeleted(true);
+            appPasswordResetRepository.save(reset);
+            return;
+        }
+        throw new PassswordResetException("设置新密码失败");
     }
 }

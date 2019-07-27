@@ -46,9 +46,11 @@ public class RegisterController {
         if (StringUtils.isEmpty(register.getVerifyUri())) {
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
             String origin = request.getHeader("origin"); // http://192.168.124.95:16000
+            if (null == origin) {
+                throw new RegisterException("参数缺少[verifyUri]或请求头缺少[origin]");
+            }
             register.setVerifyUri(String.format("%s/auth/register/verify", origin));
             log.info("setVerifyUri origin={}", origin);
-
 //            String host = request.getHeader("host"); // host = dev.local:16000 // 跟 nginx 的 server_name 有关
 //            if (!StringUtils.isEmpty(origin)) host = origin;
 //            String xForwardedFor = request.getHeader("x-forwarded-for"); // x-forwarded-for = 192.168.124.95

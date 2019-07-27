@@ -64,7 +64,7 @@ public class AppCaptchaServiceImpl implements AppCaptchaService {
         if (StringUtils.isEmpty(captcha)) {
             throw new CaptchaException("图形验证码为空");
         }
-        if (System.currentTimeMillis() - date > CAPTCHA_EXPIRED) {
+        if (null == date || System.currentTimeMillis() - date > CAPTCHA_EXPIRED) {
             throw new CaptchaException("图形验证码超时");
         }
         if (!captcha.equalsIgnoreCase(key)) {

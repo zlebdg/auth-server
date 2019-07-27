@@ -6,7 +6,8 @@ import com.github.xuqplus2.authserver.exception.RegisterException;
 import com.github.xuqplus2.authserver.vo.req.auth.register.Register;
 import com.github.xuqplus2.authserver.vo.req.auth.register.RegisterVerify;
 import com.github.xuqplus2.authserver.vo.req.auth.register.ResendEmail;
-import com.github.xuqplus2.authserver.vo.req.auth.reset.PassswordReset;
+import com.github.xuqplus2.authserver.vo.req.auth.reset.PasswordReset;
+import com.github.xuqplus2.authserver.vo.req.auth.reset.PasswordResetVerify;
 
 public interface AuthService {
 
@@ -18,5 +19,7 @@ public interface AuthService {
 
     void registerResendEmail(ResendEmail resendEmail) throws RegisterException;
 
-    void reset(PassswordReset reset) throws PassswordResetException;
+    void reset(PasswordReset reset) throws PassswordResetException;
+
+    void resetVerify(PasswordResetVerify verify) throws PassswordResetException;
 }
