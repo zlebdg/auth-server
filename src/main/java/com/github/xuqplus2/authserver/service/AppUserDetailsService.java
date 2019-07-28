@@ -16,9 +16,11 @@ public class AppUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        AppUser appUser = appUserRepository.getByUsername(username);
+        AppUser appUser = username.contains("@")
+                ? appUserRepository.getByEmail(username)
+                : appUserRepository.getByUsername(username);
         if (null == appUser) {
-            throw new UsernameNotFoundException("用户名不存在");
+            throw new UsernameNotFoundException("账号不存在");
         }
         return appUser;
     }
