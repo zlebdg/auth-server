@@ -54,9 +54,9 @@ public class BindingResultProcessor {
                 BindingResult bindingResult = (BindingResult) arg;
                 if (null != bindingResult && bindingResult.hasErrors()) {
                     FieldError fieldError = bindingResult.getFieldError();
-                    String fieldErrorMessage = String.format("object [%s]'s field [%s] %s",
+                    log.info("fieldError, objectName={}, field={}, message={}",
                             fieldError.getObjectName(), fieldError.getField(), fieldError.getDefaultMessage());
-                    throw new RuntimeException(fieldErrorMessage);
+                    throw new RuntimeException(fieldError.getDefaultMessage());
                 }
                 return;
             }

@@ -27,6 +27,8 @@ import javax.validation.Valid;
 @Slf4j
 public class ResetController {
 
+    static final String REGISTER_VERIFY_URI = "%s/antd/#/antd/user/reset/verify";
+
     @Autowired
     AuthService authService;
 
@@ -41,7 +43,7 @@ public class ResetController {
             if (null == origin) {
                 throw new PassswordResetException("参数缺少[verifyUri]或请求头缺少[origin]");
             }
-            reset.setVerifyUri(String.format("%s/auth/reset/verify", origin));
+            reset.setVerifyUri(String.format(REGISTER_VERIFY_URI, origin));
             log.info("setVerifyUri origin={}", origin);
         }
         log.info("reset=>{}", reset);

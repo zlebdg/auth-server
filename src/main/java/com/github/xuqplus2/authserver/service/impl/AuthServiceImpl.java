@@ -149,7 +149,10 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public void resetVerify(PasswordResetVerify verify) throws PassswordResetException {
-        AppPasswordReset reset = appPasswordResetRepository.getByUsername(verify.getUsername());
+        String[] verifyCode = verify.getVerifyCode().split(";");
+        String username = verifyCode[0];
+        String encryptCode = verifyCode[1];
+        AppPasswordReset reset = appPasswordResetRepository.getByUsername(username);
         if (null == reset) {
             throw new PassswordResetException("没有密码重置申请记录");
         }
@@ -159,8 +162,8 @@ public class AuthServiceImpl implements AuthService {
         if (StringUtils.isEmpty(verify.getPassword())) {
             throw new PassswordResetException("缺少[password]参数");
         }
-        if (reset.getVerifyCode().equals(verify.getVerifyCode())) {
-            AppUser user = appUserRepository.getByUsername(verify.getUsername());
+        if (delegatingPasswordEncoder.matches(reset.getVerifyCode(), encryptCode)) {
+            AppUser user = appUserRepository.getByUsername(username);
             user.setNewPassword(verify.getPassword(), encryptService);
             appUserRepository.save(user);
             reset.setIsDeleted(true);
