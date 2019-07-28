@@ -31,6 +31,8 @@ import javax.validation.Valid;
 @Slf4j
 public class RegisterController {
 
+    static final String REGISTER_VERIFY_URI = "%s/antd/#/antd/user/register/verify";
+
     @Autowired
     AuthService authService;
 
@@ -49,7 +51,7 @@ public class RegisterController {
             if (null == origin) {
                 throw new RegisterException("参数缺少[verifyUri]或请求头缺少[origin]");
             }
-            register.setVerifyUri(String.format("%s/auth/register/verify", origin));
+            register.setVerifyUri(String.format(REGISTER_VERIFY_URI, origin));
             log.info("setVerifyUri origin={}", origin);
 //            String host = request.getHeader("host"); // host = dev.local:16000 // 跟 nginx 的 server_name 有关
 //            if (!StringUtils.isEmpty(origin)) host = origin;

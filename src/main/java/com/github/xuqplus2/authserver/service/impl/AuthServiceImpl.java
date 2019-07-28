@@ -21,6 +21,7 @@ import com.github.xuqplus2.authserver.vo.req.auth.reset.PasswordResetVerify;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -41,6 +42,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     EncryptService encryptService;
+
+    @Autowired
+    DelegatingPasswordEncoder delegatingPasswordEncoder;
 
     @Autowired
     ApplicationEventPublisher eventPublisher;
@@ -66,21 +70,24 @@ public class AuthServiceImpl implements AuthService {
 
     @Transactional
     public void registerVerify(RegisterVerify verify) throws RegisterException, PasswordNotSetException {
-        if (appUserRepository.existsByUsername(verify.getUsername())) {
+        String[] verifyCode = verify.getVerifyCode().split(";");
+        String username = verifyCode[0];
+        String encryptCode = verifyCode[1];
+        if (appUserRepository.existsByUsername(username)) {
             return;
         }
-        AppRegister register = appRegisterRepository.getByUsername(verify.getUsername());
+        AppRegister register = appRegisterRepository.getByUsername(username);
         if (null == register) {
             throw new RegisterException("没有查到注册信息");
         }
         if (register.getIsDeleted()) {
             throw new RegisterException("注册信息过期");
         }
-        if (!verify.getVerifyCode().equalsIgnoreCase(register.getVerifyCode())) {
+        if (!delegatingPasswordEncoder.matches(register.getVerifyCode(), encryptCode)) {
             throw new RegisterException("验证失败");
         }
         if (StringUtils.isEmpty(verify.getPassword())) {
-            throw new PasswordNotSetException();
+            throw new PasswordNotSetException("没有设置密码");
         }
         AppUser appUser = new AppUser(register, verify);
         appUser.setNewPassword(appUser.getPassword(), encryptService);
