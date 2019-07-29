@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -25,6 +26,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     EncryptService encryptService;
+
+    @Autowired
+    PersistentTokenRepository persistentTokenRepository;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -48,7 +52,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/admin").hasRole("admin")
                 .antMatchers("/root").hasRole("root")
                 .anyRequest().authenticated().and()
-                .csrf().disable();
+                // token 持久化
+                .rememberMe().tokenRepository(persistentTokenRepository)
+                .and()
+                .csrf().disable()
+        ;
     }
 
     // role会转换成权限ROLE_${role}, 设置了权限时role会被忽略
