@@ -1,11 +1,9 @@
 package com.github.xuqplus2.authserver.controller.test;
 
 import com.github.xuqplus2.authserver.util.RandomUtil;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
@@ -36,12 +34,33 @@ public class TestMappingController {
     }
 
     @GetMapping("bbb")
-    public String b() {
+    public String b(HttpServletRequest request, HttpServletResponse response) {
         return "ok bbb";
     }
 
     @GetMapping("ccc")
-    public String c(String param) {
+    public String c(HttpServletRequest request, HttpServletResponse response, String param) {
         return "ok ccc, param=" + param;
     }
+
+    @PostMapping("ddd")
+    public String d(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        if (RandomUtil.nextInt(10) > 6) {
+            request.getRequestDispatcher("/test/mapping/eee").forward(request, response);
+            return null;
+        }
+        return "ok ddd, a=";
+    }
+
+    @PostMapping("eee")
+    public String e(HttpServletRequest request, HttpServletResponse response, A a) {
+        return "ok eee, a=" + a;
+    }
+
+    @Data
+    public static class A {
+        private Long id;
+        private String name;
+    }
+
 }
