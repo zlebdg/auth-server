@@ -47,4 +47,16 @@ public class RandomUtil {
     public static final String secureString(int n) {
         return string(SECURE_RANDOM, n);
     }
+
+    private static final int nextInt(Random random, int n) {
+        return random.nextInt(n);
+    }
+
+    public static final int nextInt(int n) {
+        return nextInt(RANDOM, n);
+    }
+
+    public static final int secureNextInt(int n) {
+        return nextInt(SECURE_RANDOM, n);
+    }
 }

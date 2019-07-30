@@ -12,6 +12,10 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
 @Configuration
@@ -30,6 +34,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     PersistentTokenRepository persistentTokenRepository;
 
+    @Autowired
+    AuthenticationSuccessHandler authenticationSuccessHandler;
+
+    @Autowired
+    AuthenticationFailureHandler authenticationFailureHandler;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -37,6 +47,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //                .openidLogin().loginPage("/login.html").and() // todo to be known
                 .formLogin()
                 .loginProcessingUrl("/login")
+                .successHandler(authenticationSuccessHandler)
+                .failureHandler(authenticationFailureHandler)
                 .loginPage("/login.html") // 重写登录网页
                 .and()
                 .authorizeRequests()
@@ -96,5 +108,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     public AppDaoAuthenticationProvider appDaoAuthenticationProvider(AppUserDetailsService appUserDetailsService, DelegatingPasswordEncoder delegatingPasswordEncoder) {
         return new AppDaoAuthenticationProvider(appUserDetailsService, delegatingPasswordEncoder);
+    }
+
+    @Bean
+    public AuthenticationSuccessHandler authenticationSuccessHandler() {
+        SimpleUrlAuthenticationSuccessHandler handler = new SimpleUrlAuthenticationSuccessHandler();
+        return handler;
+    }
+
+    @Bean
+    public AuthenticationFailureHandler authenticationFailureHandler() {
+        SimpleUrlAuthenticationFailureHandler handler = new SimpleUrlAuthenticationFailureHandler();
+        return handler;
     }
 }
