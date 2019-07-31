@@ -11,7 +11,8 @@ import com.github.xuqplus2.authserver.vo.req.auth.reset.PasswordResetVerify;
 
 public interface AuthService {
 
-    long REGISTER_EVENT_PUBLISH_INTERVAL = 1000L * 60;
+    // 注册验证邮件重发间隔
+    long REGISTER_EMAIL_SENDING_INTERVAL = 1000L * 60;
 
     void register(Register register) throws RegisterException;
 

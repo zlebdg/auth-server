@@ -16,7 +16,10 @@ import javax.persistence.Id;
 @EqualsAndHashCode(callSuper = true)
 public class AppPasswordReset extends BasicDomain {
 
+    // 密码重置验证code长度
     private static final int VERIFY_CODE_LENGTH = 64;
+    // 密码重置信息过期时间
+    public static final long EXPIRED_TIME_MILLS = 1000L * 60 * 60 * 24;
 
     @Id
     @Column(length = 64)
@@ -35,6 +38,10 @@ public class AppPasswordReset extends BasicDomain {
 
     public void refreshVerifyCode() {
         this.verifyCode = RandomUtil.string(VERIFY_CODE_LENGTH);
+    }
+
+    public boolean isExpired() {
+        return System.currentTimeMillis() - this.getCreateAt() > EXPIRED_TIME_MILLS;
     }
 }
 

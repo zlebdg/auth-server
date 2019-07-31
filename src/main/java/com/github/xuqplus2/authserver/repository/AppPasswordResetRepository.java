@@ -6,4 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface AppPasswordResetRepository extends JpaRepository<AppPasswordReset, String> {
 
     AppPasswordReset getByUsername(String username);
+
+    void deleteByCreateAtLessThan(long l);
+
+    void deleteByCreateAtLessThanAndIsDeletedTrue(long l);
 }

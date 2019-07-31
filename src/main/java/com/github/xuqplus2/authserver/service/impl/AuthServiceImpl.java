@@ -73,15 +73,15 @@ public class AuthServiceImpl implements AuthService {
         String[] verifyCode = verify.getVerifyCode().split(";");
         String username = verifyCode[0];
         String encryptCode = verifyCode[1];
-        if (appUserRepository.existsByUsername(username)) {
-            return;
-        }
         AppRegister register = appRegisterRepository.getByUsername(username);
         if (null == register) {
             throw new RegisterException("没有查到注册信息");
         }
         if (register.getIsDeleted()) {
-            throw new RegisterException("注册信息过期");
+            return; // 幂等处理
+        }
+        if (register.isExpired()) {
+            throw new RegisterException("注册申请过期");
         }
         if (!delegatingPasswordEncoder.matches(register.getVerifyCode(), encryptCode)) {
             throw new RegisterException("验证失败");
@@ -101,8 +101,8 @@ public class AuthServiceImpl implements AuthService {
         AppRegister appRegister = appRegisterRepository.getByUsernameAndEmailAndIsDeletedFalse(resendEmail.getUsername(), resendEmail.getEmail());
         if (null != appRegister) {
             // 邮件重发间隔
-            if ((null == appRegister.getUpdateAt() && System.currentTimeMillis() - appRegister.getCreateAt() > REGISTER_EVENT_PUBLISH_INTERVAL)
-                    || (null != appRegister.getUpdateAt() && System.currentTimeMillis() - appRegister.getUpdateAt() > REGISTER_EVENT_PUBLISH_INTERVAL)) {
+            if ((null == appRegister.getUpdateAt() && System.currentTimeMillis() - appRegister.getCreateAt() > REGISTER_EMAIL_SENDING_INTERVAL)
+                    || (null != appRegister.getUpdateAt() && System.currentTimeMillis() - appRegister.getUpdateAt() > REGISTER_EMAIL_SENDING_INTERVAL)) {
                 appRegister.refreshVerifyCode();
                 appRegisterRepository.save(appRegister);
                 // 发布事件
@@ -158,6 +158,9 @@ public class AuthServiceImpl implements AuthService {
         }
         if (reset.getIsDeleted()) {
             return; // 幂等处理
+        }
+        if (reset.isExpired()) {
+            throw new PassswordResetException("密码重置申请过期");
         }
         if (StringUtils.isEmpty(verify.getPassword())) {
             throw new PassswordResetException("缺少[password]参数");

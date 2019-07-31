@@ -12,4 +12,8 @@ public interface AppRegisterRepository extends JpaRepository<AppRegister, String
     AppRegister getByUsername(String username);
 
     AppRegister getByUsernameAndEmailAndIsDeletedFalse(String username, String email);
+
+    void deleteByCreateAtLessThan(long l);
+
+    void deleteByCreateAtLessThanAndIsDeletedTrue(long l);
 }
