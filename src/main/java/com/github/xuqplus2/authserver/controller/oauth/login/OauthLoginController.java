@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
@@ -29,7 +30,11 @@ public class OauthLoginController {
     OAuthApp.AlipayApp alipayApp;
 
     @GetMapping("github")
-    public ModelAndView github(ModelAndView mav) {
+    public ModelAndView github(HttpServletRequest request, ModelAndView mav) {
+        String referer = request.getHeader("Referer");
+        String sessionId = request.getRequestedSessionId();
+        log.info("github, referer={}, sessionId={}", referer, sessionId);
+
         mav.setViewName(String.format(
                 TEMPLATE_AUTHORIZE_URL_GITHUB,
                 githubApp.getClientId(),
@@ -40,7 +45,11 @@ public class OauthLoginController {
     }
 
     @GetMapping("alipay")
-    public ModelAndView alipay(ModelAndView mav) throws UnsupportedEncodingException {
+    public ModelAndView alipay(HttpServletRequest request, ModelAndView mav) throws UnsupportedEncodingException {
+        String referer = request.getHeader("Referer");
+        String sessionId = request.getRequestedSessionId();
+        log.info("github, referer={}, sessionId={}", referer, sessionId);
+
         mav.setViewName(String.format(TEMPLATE_AUTHORIZE_URL_ALIAPY,
                 alipayApp.getAppId(), URLEncoder.encode(alipayApp.getAuthCallbackUrl(), alipayApp.getCharset()), alipayApp.getScope(), RandomUtil.numeric(STATE_LENGTH)));
         return mav;
