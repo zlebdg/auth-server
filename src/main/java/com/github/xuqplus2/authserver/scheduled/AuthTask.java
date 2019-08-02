@@ -34,8 +34,7 @@ public class AuthTask {
     @Transactional
     @Scheduled(fixedDelay = 1000L * 60 * 10)
     public void cleanDeleteDAndExpiredAppPasswordReset() {
-        log.info("{} task start", Thread.currentThread().getStackTrace()[1].getMethodName());
-        log.info("task start");
+        log.info("{} task start.", Thread.currentThread().getStackTrace()[1].getMethodName());
         // 过期的
         appPasswordResetRepository.deleteByCreateAtLessThan(System.currentTimeMillis() - AppRegister.EXPIRED_TIME_MILLS);
         // 重置过的
