@@ -1,7 +1,7 @@
 package com.github.xuqplus2.authserver.config;
 
-import com.github.xuqplus2.authserver.service.AppDaoAuthenticationProvider;
-import com.github.xuqplus2.authserver.service.AppUserDetailsService;
+import com.github.xuqplus2.authserver.config.kz.AppDaoAuthenticationProvider;
+import com.github.xuqplus2.authserver.config.kz.AppUserDetailsService;
 import com.github.xuqplus2.authserver.service.EncryptService;
 import com.github.xuqplus2.authserver.vo.resp.BasicResp;
 import lombok.extern.slf4j.Slf4j;
@@ -20,10 +20,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
+import org.springframework.security.web.authentication.*;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.web.accept.ContentNegotiationManager;
 import org.springframework.web.context.request.ServletWebRequest;
@@ -41,27 +38,22 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     AppDaoAuthenticationProvider appDaoAuthenticationProvider;
-
     @Autowired
     DelegatingPasswordEncoder delegatingPasswordEncoder;
-
     @Autowired
     EncryptService encryptService;
-
     @Autowired
     PersistentTokenRepository persistentTokenRepository;
-
     @Autowired
     AuthenticationSuccessHandler authenticationSuccessHandler;
-
     @Autowired
     AuthenticationFailureHandler authenticationFailureHandler;
-
     @Autowired
     ContentNegotiationManager contentNegotiationManager;
-
     @Autowired
     StringHttpMessageConverter stringHttpMessageConverter;
+    @Autowired
+    RememberMeServices rememberMeServices;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -88,7 +80,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/root").hasRole("root")
                 .anyRequest().authenticated().and()
                 // token 持久化
-                .rememberMe().tokenRepository(persistentTokenRepository)
+                .rememberMe().tokenRepository(persistentTokenRepository).rememberMeServices(rememberMeServices)
                 .and()
                 .csrf().disable()
         ;

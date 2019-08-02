@@ -1,4 +1,4 @@
-package com.github.xuqplus2.authserver.service;
+package com.github.xuqplus2.authserver.config.kz;
 
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.Authentication;

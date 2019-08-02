@@ -1,13 +1,13 @@
 package com.github.xuqplus2.authserver.config;
 
+import com.github.xuqplus2.authserver.AuthServerApplicationTests;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Slf4j
-@Ignore
-public class WebSecurityConfigTest {
+public class WebSecurityConfigTest extends AuthServerApplicationTests {
 
     @Test
     public void bcrypt() {
@@ -18,4 +18,11 @@ public class WebSecurityConfigTest {
         log.info("bcrypt=>{}", aaa);
     }
 
+    @Autowired
+    WebSecurityConfig webSecurityConfig;
+
+    @Test
+    public void a() {
+        log.info("");
+    }
 }

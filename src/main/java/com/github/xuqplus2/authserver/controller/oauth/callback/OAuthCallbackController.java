@@ -9,6 +9,7 @@ import com.alipay.api.request.AlipayUserInfoShareRequest;
 import com.alipay.api.response.AlipaySystemOauthTokenResponse;
 import com.alipay.api.response.AlipayUserInfoShareResponse;
 import com.github.xuqplus2.authserver.config.OAuthApp;
+import com.github.xuqplus2.authserver.config.kz.AppRememberMeServices;
 import com.github.xuqplus2.authserver.controller.oauth.token.GithubAccessToken;
 import com.github.xuqplus2.authserver.domain.AlipayUserInfo;
 import com.github.xuqplus2.authserver.domain.GithubUserInfo;
@@ -63,6 +64,8 @@ public class OAuthCallbackController {
     GithubUserInfoRepository githubUserInfoRepository;
     @Autowired
     AlipayUserInfoRepository alipayUserInfoRepository;
+    @Autowired
+    AppRememberMeServices rememberMeServices;
 
     private final RequestCache requestCache = new HttpSessionRequestCache();
 
@@ -111,6 +114,8 @@ public class OAuthCallbackController {
                         new JaasAuthenticationToken(principal, githubAccessToken, Collections.EMPTY_LIST, null);
 //                jaasAuthenticationToken.setDetails(githubUserInfo); // 注释掉省内存
                 SecurityContextHolder.getContext().setAuthentication(jaasAuthenticationToken);
+                // 记住登录状态
+                rememberMeServices.onLoginSuccess(request, response, jaasAuthenticationToken);
 
                 forward(request, response); // 重定向
             }

@@ -1,6 +1,7 @@
-package com.github.xuqplus2.authserver.service;
+package com.github.xuqplus2.authserver.config.kz;
 
 import com.github.xuqplus2.authserver.domain.AppUser;
+import com.github.xuqplus2.authserver.service.EncryptService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
