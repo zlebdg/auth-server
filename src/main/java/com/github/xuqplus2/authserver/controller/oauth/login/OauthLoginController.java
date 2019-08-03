@@ -39,7 +39,7 @@ public class OauthLoginController {
     @GetMapping("github")
     public ModelAndView github(HttpServletRequest request, ModelAndView mav) {
         String referer = request.getHeader("Referer");
-        String sessionId = request.getRequestedSessionId();
+        String sessionId = request.getSession().getId();
         log.info("github, referer={}, sessionId={}", referer, sessionId);
 
         String encryptSessionId = encryptService.sha256Md5(sessionId);
