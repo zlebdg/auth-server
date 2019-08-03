@@ -62,11 +62,19 @@ public class OAuthLoginController {
     @GetMapping("alipay")
     public ModelAndView alipay(HttpServletRequest request, ModelAndView mav) throws UnsupportedEncodingException {
         String referer = request.getHeader("Referer");
-        String sessionId = request.getRequestedSessionId();
+        String sessionId = request.getSession().getId();
         log.info("github, referer={}, sessionId={}", referer, sessionId);
 
+        String encryptSessionId = encryptService.sha256Md5(sessionId);
+        if (callbackAddressRepository.existsByEncryptSessionIdAndIsDeletedFalse(encryptSessionId)) {
+            callbackAddressRepository.updateRefererById(referer, System.currentTimeMillis(), encryptSessionId);
+        } else {
+            OAuthCallbackAddress callbackAddress = new OAuthCallbackAddress(encryptSessionId, referer);
+            callbackAddressRepository.save(callbackAddress);
+        }
+
         mav.setViewName(String.format(TEMPLATE_AUTHORIZE_URL_ALIAPY,
-                alipayApp.getAppId(), URLEncoder.encode(alipayApp.getAuthCallbackUrl(), alipayApp.getCharset()), alipayApp.getScope(), RandomUtil.numeric(STATE_LENGTH)));
+                alipayApp.getAppId(), URLEncoder.encode(alipayApp.getAuthCallbackUrl(), alipayApp.getCharset()), alipayApp.getScope(), encryptSessionId));
         return mav;
     }
 }

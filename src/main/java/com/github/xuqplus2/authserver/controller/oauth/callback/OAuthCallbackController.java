@@ -10,14 +10,8 @@ import com.alipay.api.response.AlipaySystemOauthTokenResponse;
 import com.alipay.api.response.AlipayUserInfoShareResponse;
 import com.github.xuqplus2.authserver.config.OAuthApp;
 import com.github.xuqplus2.authserver.config.kz.AppRememberMeServices;
-import com.github.xuqplus2.authserver.domain.oauth.GithubAccessToken;
-import com.github.xuqplus2.authserver.domain.oauth.AlipayUserInfo;
-import com.github.xuqplus2.authserver.domain.oauth.GithubUserInfo;
-import com.github.xuqplus2.authserver.domain.oauth.OAuthCallbackAddress;
-import com.github.xuqplus2.authserver.repository.AlipayUserInfoRepository;
-import com.github.xuqplus2.authserver.repository.GithubAccessTokenRepository;
-import com.github.xuqplus2.authserver.repository.GithubUserInfoRepository;
-import com.github.xuqplus2.authserver.repository.OAuthCallbackAddressRepository;
+import com.github.xuqplus2.authserver.domain.oauth.*;
+import com.github.xuqplus2.authserver.repository.*;
 import com.github.xuqplus2.authserver.util.UrlUtil;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
@@ -73,6 +67,8 @@ public class OAuthCallbackController {
     @Autowired
     GithubAccessTokenRepository githubAccessTokenRepository;
     @Autowired
+    AlipayAccessTokenRepository alipayAccessTokenRepository;
+    @Autowired
     AppRememberMeServices rememberMeServices;
 
     private final RequestCache requestCache = new HttpSessionRequestCache();
@@ -85,7 +81,6 @@ public class OAuthCallbackController {
     @GetMapping("github")
     public String github(String code, String state, boolean redirect, HttpServletRequest request, HttpServletResponse response) throws IOException {
         log.info("code=>{}, state=>{}", code, state);
-        OkHttpClient okHttpClient = new OkHttpClient();
 
         // 根据请求oauth时的referer进行重定向
         if (!redirect && oAuthCallbackAddressRepository.existsByEncryptSessionIdAndIsDeletedFalse(state)) {
@@ -97,6 +92,7 @@ public class OAuthCallbackController {
         }
 
         /* 获取 access token */
+        OkHttpClient okHttpClient = new OkHttpClient();
         GithubAccessToken githubAccessToken =
                 JSON.parseObject(okHttpClient.newCall(new Request.Builder()
                         .url(String.format(TEMPLATE_OAUTH_ACCESS_TOKEN_URI_GITHUB,
@@ -129,12 +125,21 @@ public class OAuthCallbackController {
                 /* 手动设置登录状态 jaas, java认证授权服务 */
                 JaasAuthenticationToken jaasAuthenticationToken =
                         new JaasAuthenticationToken(githubUserInfo, githubAccessToken, Collections.EMPTY_LIST, null);
-//                jaasAuthenticationToken.setDetails(githubUserInfo); // 注释掉省内存
                 SecurityContextHolder.getContext().setAuthentication(jaasAuthenticationToken);
                 // 记住登录状态
                 rememberMeServices.onLoginSuccess(request, response, jaasAuthenticationToken);
 
-                forward(request, response); // 重定向到登录前被拦截的请求
+                // 尝试重定向到登录前被拦截的请求
+                // 重定向到 auth server 授权页面
+                // 授权完会重定向到 auth client 登录页面
+                // auth client 也记录了登录前被拦截的页面, 最终定向到拦截前的页面
+                SavedRequest savedRequest = requestCache.getRequest(request, response);
+                String url;
+                if (null != savedRequest && null != (url = savedRequest.getRedirectUrl())) {
+                    log.info("auth server redirect to url=>{}", url);
+                    response.sendRedirect(url);
+                    return null;
+                }
             }
         }
         if (oAuthCallbackAddressRepository.existsByEncryptSessionIdAndIsDeletedFalse(state)) {
@@ -149,8 +154,21 @@ public class OAuthCallbackController {
     }
 
     @GetMapping("alipay")
-    public String alipay(String app_id, String scope, String auth_code, String state, HttpServletRequest request, HttpServletResponse response) {
+    public String alipay(String app_id, String scope, String auth_code, String state, boolean redirect, HttpServletRequest request, HttpServletResponse response) throws IOException {
         log.info("alipay callback, app_id={}, scope={}, auth_code={}, state={}", app_id, scope, auth_code, state);
+
+        // 根据请求oauth时的referer进行重定向
+        if (!redirect && oAuthCallbackAddressRepository.existsByEncryptSessionIdAndIsDeletedFalse(state)) {
+            OAuthCallbackAddress callbackAddress = oAuthCallbackAddressRepository.getByEncryptSessionIdAndIsDeletedFalse(state);
+            log.info("alipay callback, app_id={}, scope={}, auth_code={}, state={}", app_id, scope, auth_code, state);
+            log.info("callbackAddress app_id={}, scope={}, auth_code={}, state={}, referer=>{}",
+                    app_id, scope, auth_code, state, callbackAddress);
+            response.sendRedirect(String.format("%s/oauth/callback/alipay/?%s&redirect=true",
+                    UrlUtil.getOrigin(callbackAddress.getReferer()), request.getQueryString()));
+            return null;
+        }
+
+        /* 获取 access token */
         AlipayClient alipayClient = new DefaultAlipayClient(
                 alipayApp.getAlipayGateway(),
                 alipayApp.getAppId(),
@@ -166,25 +184,35 @@ public class OAuthCallbackController {
             AlipaySystemOauthTokenResponse alipayAccessToken = alipayClient.execute(alipaySystemOauthTokenRequest);
             if (null != alipayAccessToken && alipayAccessToken.isSuccess()) {
                 log.info("alipayAccessToken=>{}", alipayAccessToken);
+                AlipayAccessToken accessToken = new AlipayAccessToken();
+                BeanUtils.copyProperties(alipayAccessToken, accessToken);
+                // 保存 access token
+                alipayAccessTokenRepository.save(accessToken);
 
                 AlipayUserInfoShareResponse alipayUserInfo = alipayClient.execute(new AlipayUserInfoShareRequest(), alipayAccessToken.getAccessToken());
                 if (null != alipayUserInfo && alipayUserInfo.isSuccess()) {
-                    AlipayUserInfo alipayUserInfoLocal = new AlipayUserInfo();
-                    BeanUtils.copyProperties(alipayUserInfo, alipayUserInfoLocal);
+                    AlipayUserInfo userInfo = new AlipayUserInfo();
+                    BeanUtils.copyProperties(alipayUserInfo, userInfo);
                     // 保存用户信息
-                    alipayUserInfoRepository.save(alipayUserInfoLocal);
-                    log.info("alipayUserInfoLocal=>{}", alipayUserInfoLocal);
+                    userInfo.setToken(accessToken);
+                    alipayUserInfoRepository.save(userInfo);
+                    log.info("userInfo=>{}", userInfo);
 
                     /* 手动设置登录状态 jaas */
-                    // credential 保存access token,
-                    // principal 只保存用户id 节省空间, 需要详细信息时, 查询数据库或者用token调用用户信息接口
-                    String principal = String.format("%s,%s", OAuthApp.AlipayApp.class.getSimpleName(), alipayUserInfoLocal.getUserId());
                     JaasAuthenticationToken jaasAuthenticationToken =
-                            new JaasAuthenticationToken(principal, alipayAccessToken, Collections.EMPTY_LIST, null);
-//                    jaasAuthenticationToken.setDetails(alipayUserInfoLocal); // 注释掉省内存
+                            new JaasAuthenticationToken(userInfo, alipayAccessToken, Collections.EMPTY_LIST, null);
                     SecurityContextHolder.getContext().setAuthentication(jaasAuthenticationToken);
+                    // 记住登录状态
+                    rememberMeServices.onLoginSuccess(request, response, jaasAuthenticationToken);
 
-                    forward(request, response); // 重定向到登录前被拦截的请求
+                    // 尝试重定向到登录前被拦截的请求
+                    SavedRequest savedRequest = requestCache.getRequest(request, response);
+                    String url;
+                    if (null != savedRequest && null != (url = savedRequest.getRedirectUrl())) {
+                        log.info("auth server redirect to url=>{}", url);
+                        response.sendRedirect(url);
+                        return null;
+                    }
                 }
             }
         } catch (AlipayApiException e) {
@@ -192,19 +220,15 @@ public class OAuthCallbackController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        if (oAuthCallbackAddressRepository.existsByEncryptSessionIdAndIsDeletedFalse(state)) {
+            OAuthCallbackAddress callbackAddress = oAuthCallbackAddressRepository.getByEncryptSessionIdAndIsDeletedFalse(state);
+            String referer = callbackAddress.getReferer();
+            if (referer.endsWith("antd/") || referer.endsWith("antd")) {
+                response.sendRedirect(referer);
+                return null;
+            }
+        }
         // 返回当前用户名
         return SecurityContextHolder.getContext().getAuthentication().getName();
-    }
-
-    // 重定向到 auth server 授权页面
-    // 授权完会重定向到 auth client 登录页面
-    // auth client 也记录了登录前被拦截的页面, 最终定向到拦截前的页面
-    private void forward(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        SavedRequest savedRequest = requestCache.getRequest(request, response);
-        String url;
-        if (null != savedRequest && null != (url = savedRequest.getRedirectUrl())) {
-            log.info("auth server redirect to url=>{}", url);
-            response.sendRedirect(url);
-        }
     }
 }
