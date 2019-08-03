@@ -1,6 +1,9 @@
 package com.github.xuqplus2.authserver.controller.oauth.login;
 
 import com.github.xuqplus2.authserver.config.OAuthApp;
+import com.github.xuqplus2.authserver.domain.OAuthCallbackAddress;
+import com.github.xuqplus2.authserver.repository.OAuthCallbackAddressRepository;
+import com.github.xuqplus2.authserver.service.EncryptService;
 import com.github.xuqplus2.authserver.util.RandomUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +31,10 @@ public class OauthLoginController {
     OAuthApp.GithubApp githubApp;
     @Autowired
     OAuthApp.AlipayApp alipayApp;
+    @Autowired
+    EncryptService encryptService;
+    @Autowired
+    OAuthCallbackAddressRepository callbackAddressRepository;
 
     @GetMapping("github")
     public ModelAndView github(HttpServletRequest request, ModelAndView mav) {
@@ -35,12 +42,20 @@ public class OauthLoginController {
         String sessionId = request.getRequestedSessionId();
         log.info("github, referer={}, sessionId={}", referer, sessionId);
 
+        String encryptSessionId = encryptService.sha256Md5(sessionId);
+        if (callbackAddressRepository.existsByEncryptSessionIdAndIsDeletedFalse(encryptSessionId)) {
+            callbackAddressRepository.updateRefererById(referer, System.currentTimeMillis(), encryptSessionId);
+        } else {
+            OAuthCallbackAddress callbackAddress = new OAuthCallbackAddress(encryptSessionId, referer);
+            callbackAddressRepository.save(callbackAddress);
+        }
+
         mav.setViewName(String.format(
                 TEMPLATE_AUTHORIZE_URL_GITHUB,
                 githubApp.getClientId(),
                 githubApp.getRedirectUri(),
                 githubApp.getScope(),
-                RandomUtil.numeric(STATE_LENGTH)));
+                encryptSessionId));
         return mav;
     }
 

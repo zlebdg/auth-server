@@ -13,8 +13,11 @@ import com.github.xuqplus2.authserver.config.kz.AppRememberMeServices;
 import com.github.xuqplus2.authserver.controller.oauth.token.GithubAccessToken;
 import com.github.xuqplus2.authserver.domain.AlipayUserInfo;
 import com.github.xuqplus2.authserver.domain.GithubUserInfo;
+import com.github.xuqplus2.authserver.domain.OAuthCallbackAddress;
 import com.github.xuqplus2.authserver.repository.AlipayUserInfoRepository;
 import com.github.xuqplus2.authserver.repository.GithubUserInfoRepository;
+import com.github.xuqplus2.authserver.repository.OAuthCallbackAddressRepository;
+import com.github.xuqplus2.authserver.util.UrlUtil;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -65,6 +68,8 @@ public class OAuthCallbackController {
     @Autowired
     AlipayUserInfoRepository alipayUserInfoRepository;
     @Autowired
+    OAuthCallbackAddressRepository oAuthCallbackAddressRepository;
+    @Autowired
     AppRememberMeServices rememberMeServices;
 
     private final RequestCache requestCache = new HttpSessionRequestCache();
@@ -75,9 +80,18 @@ public class OAuthCallbackController {
             "https://api.github.com/user?access_token=%s";
 
     @GetMapping("github")
-    public String github(String code, String state, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public String github(String code, String state, boolean redirect, HttpServletRequest request, HttpServletResponse response) throws IOException {
         log.info("code=>{}, state=>{}", code, state);
         OkHttpClient okHttpClient = new OkHttpClient();
+
+        // 根据请求oauth时的referer进行重定向
+        if (!redirect && oAuthCallbackAddressRepository.existsByEncryptSessionIdAndIsDeletedFalse(state)) {
+            OAuthCallbackAddress callbackAddress = oAuthCallbackAddressRepository.getByEncryptSessionIdAndIsDeletedFalse(state);
+            log.info("callbackAddress code=>{}, state=>{}, referer=>{}", code, state, callbackAddress);
+            response.sendRedirect(String.format("%s/oauth/callback/github/?%s&redirect=true",
+                    UrlUtil.getOrigin(callbackAddress.getReferer()), request.getQueryString()));
+            return null;
+        }
 
         /* 获取 access token */
         GithubAccessToken githubAccessToken =
@@ -117,10 +131,17 @@ public class OAuthCallbackController {
                 // 记住登录状态
                 rememberMeServices.onLoginSuccess(request, response, jaasAuthenticationToken);
 
-                forward(request, response); // 重定向
+                forward(request, response); // 重定向到登录前被拦截的请求
             }
         }
-        // 返回当前用户名
+        if (oAuthCallbackAddressRepository.existsByEncryptSessionIdAndIsDeletedFalse(state)) {
+            OAuthCallbackAddress callbackAddress = oAuthCallbackAddressRepository.getByEncryptSessionIdAndIsDeletedFalse(state);
+            String referer = callbackAddress.getReferer();
+            if (referer.endsWith("antd") || referer.endsWith("antd/")) {
+                response.sendRedirect(referer);
+                return null;
+            }
+        }
         return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 
@@ -160,7 +181,7 @@ public class OAuthCallbackController {
 //                    jaasAuthenticationToken.setDetails(alipayUserInfoLocal); // 注释掉省内存
                     SecurityContextHolder.getContext().setAuthentication(jaasAuthenticationToken);
 
-                    forward(request, response); // 重定向
+                    forward(request, response); // 重定向到登录前被拦截的请求
                 }
             }
         } catch (AlipayApiException e) {

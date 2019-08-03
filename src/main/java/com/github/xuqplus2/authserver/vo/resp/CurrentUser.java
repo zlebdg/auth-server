@@ -4,7 +4,7 @@ import com.github.xuqplus2.authserver.domain.AppUser;
 import com.github.xuqplus2.authserver.vo.VO;
 import lombok.Data;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -34,8 +34,8 @@ public class CurrentUser extends VO {
             this.roles.addAll(appUser.getAppRoles().stream().map(role -> {
                 return role.getRole();
             }).collect(Collectors.toSet()));
-        } else if (principal instanceof User) {
-            User user = (User) principal;
+        } else if (principal instanceof UserDetails) {
+            UserDetails user = (UserDetails) principal;
             this.username = user.getUsername();
             this.authenticated = authentication.isAuthenticated();
             this.authorities.addAll(user.getAuthorities().stream().map(authority -> {
