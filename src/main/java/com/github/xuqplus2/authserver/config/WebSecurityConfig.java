@@ -1,6 +1,7 @@
 package com.github.xuqplus2.authserver.config;
 
 import com.github.xuqplus2.authserver.config.kz.AppDaoAuthenticationProvider;
+import com.github.xuqplus2.authserver.config.kz.AppRememberMeServices;
 import com.github.xuqplus2.authserver.config.kz.AppUserDetailsService;
 import com.github.xuqplus2.authserver.service.EncryptService;
 import com.github.xuqplus2.authserver.vo.resp.BasicResp;
@@ -20,7 +21,10 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
-import org.springframework.security.web.authentication.*;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.web.accept.ContentNegotiationManager;
 import org.springframework.web.context.request.ServletWebRequest;
@@ -53,7 +57,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     StringHttpMessageConverter stringHttpMessageConverter;
     @Autowired
-    RememberMeServices rememberMeServices;
+    AppRememberMeServices appRememberMeServices;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -80,7 +84,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/root").hasRole("root")
                 .anyRequest().authenticated().and()
                 // token 持久化
-                .rememberMe().tokenRepository(persistentTokenRepository).rememberMeServices(rememberMeServices)
+                .rememberMe()
+                .tokenRepository(persistentTokenRepository)
+                .rememberMeServices(appRememberMeServices)
+                // TokenBasedRememberMeServices生成一个RememberMeAuthenticationToken,由RememberMeAuthenticationProvider处理。一个key认证提供者和TokenBasedRememberMeServices之间共享。
+                // ref: https://springcloud.cc/spring-security-zhcn.html#remember-me
+                .key(appRememberMeServices.getKey())
                 .and()
                 .csrf().disable()
         ;

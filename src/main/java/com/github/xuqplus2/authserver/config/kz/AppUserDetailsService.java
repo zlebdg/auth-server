@@ -1,7 +1,11 @@
 package com.github.xuqplus2.authserver.config.kz;
 
+import com.github.xuqplus2.authserver.config.OAuthApp;
 import com.github.xuqplus2.authserver.domain.AppUser;
+import com.github.xuqplus2.authserver.domain.GithubUserInfo;
+import com.github.xuqplus2.authserver.repository.AlipayUserInfoRepository;
 import com.github.xuqplus2.authserver.repository.AppUserRepository;
+import com.github.xuqplus2.authserver.repository.GithubUserInfoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -13,6 +17,10 @@ public class AppUserDetailsService implements UserDetailsService {
 
     @Autowired
     AppUserRepository appUserRepository;
+    @Autowired
+    GithubUserInfoRepository githubUserInfoRepository;
+    @Autowired
+    AlipayUserInfoRepository alipayUserInfoRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -20,6 +28,14 @@ public class AppUserDetailsService implements UserDetailsService {
                 ? appUserRepository.getByEmail(username)
                 : appUserRepository.getByUsername(username);
         if (null == appUser) {
+            // oauth用户信息
+            if (username.startsWith(OAuthApp.GithubApp.class.getSimpleName())) {
+                String oauthUsername = username.split(",")[1];
+                GithubUserInfo oauthUser = githubUserInfoRepository.getByLogin(oauthUsername);
+                if (null != oauthUser) {
+                    return oauthUser;
+                }
+            }
             throw new UsernameNotFoundException("账号不存在");
         }
         return appUser;
