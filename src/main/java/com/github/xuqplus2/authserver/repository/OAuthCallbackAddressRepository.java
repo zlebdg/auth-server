@@ -1,6 +1,6 @@
 package com.github.xuqplus2.authserver.repository;
 
-import com.github.xuqplus2.authserver.domain.OAuthCallbackAddress;
+import com.github.xuqplus2.authserver.domain.oauth.OAuthCallbackAddress;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

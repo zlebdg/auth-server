@@ -2,9 +2,10 @@ package com.github.xuqplus2.authserver.config.kz;
 
 import com.github.xuqplus2.authserver.config.OAuthApp;
 import com.github.xuqplus2.authserver.domain.AppUser;
-import com.github.xuqplus2.authserver.domain.GithubUserInfo;
+import com.github.xuqplus2.authserver.domain.oauth.GithubUserInfo;
 import com.github.xuqplus2.authserver.repository.AlipayUserInfoRepository;
 import com.github.xuqplus2.authserver.repository.AppUserRepository;
+import com.github.xuqplus2.authserver.repository.GithubAccessTokenRepository;
 import com.github.xuqplus2.authserver.repository.GithubUserInfoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,6 +22,8 @@ public class AppUserDetailsService implements UserDetailsService {
     GithubUserInfoRepository githubUserInfoRepository;
     @Autowired
     AlipayUserInfoRepository alipayUserInfoRepository;
+    @Autowired
+    GithubAccessTokenRepository githubAccessTokenRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

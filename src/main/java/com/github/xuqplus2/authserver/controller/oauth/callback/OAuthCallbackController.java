@@ -10,11 +10,12 @@ import com.alipay.api.response.AlipaySystemOauthTokenResponse;
 import com.alipay.api.response.AlipayUserInfoShareResponse;
 import com.github.xuqplus2.authserver.config.OAuthApp;
 import com.github.xuqplus2.authserver.config.kz.AppRememberMeServices;
-import com.github.xuqplus2.authserver.controller.oauth.token.GithubAccessToken;
-import com.github.xuqplus2.authserver.domain.AlipayUserInfo;
-import com.github.xuqplus2.authserver.domain.GithubUserInfo;
-import com.github.xuqplus2.authserver.domain.OAuthCallbackAddress;
+import com.github.xuqplus2.authserver.domain.oauth.GithubAccessToken;
+import com.github.xuqplus2.authserver.domain.oauth.AlipayUserInfo;
+import com.github.xuqplus2.authserver.domain.oauth.GithubUserInfo;
+import com.github.xuqplus2.authserver.domain.oauth.OAuthCallbackAddress;
 import com.github.xuqplus2.authserver.repository.AlipayUserInfoRepository;
+import com.github.xuqplus2.authserver.repository.GithubAccessTokenRepository;
 import com.github.xuqplus2.authserver.repository.GithubUserInfoRepository;
 import com.github.xuqplus2.authserver.repository.OAuthCallbackAddressRepository;
 import com.github.xuqplus2.authserver.util.UrlUtil;
@@ -70,6 +71,8 @@ public class OAuthCallbackController {
     @Autowired
     OAuthCallbackAddressRepository oAuthCallbackAddressRepository;
     @Autowired
+    GithubAccessTokenRepository githubAccessTokenRepository;
+    @Autowired
     AppRememberMeServices rememberMeServices;
 
     private final RequestCache requestCache = new HttpSessionRequestCache();
@@ -106,6 +109,8 @@ public class OAuthCallbackController {
         log.info("githubAccessToken=>{}", githubAccessToken);
 
         if (null != githubAccessToken && null != githubAccessToken.getAccess_token()) {
+            /* 保存 access token */
+            githubAccessTokenRepository.save(githubAccessToken);
             /* 获取 user info */
             GithubUserInfo githubUserInfo =
                     JSON.parseObject(okHttpClient.newCall(new Request.Builder()
@@ -117,15 +122,13 @@ public class OAuthCallbackController {
                             .execute().body().string(), GithubUserInfo.class);
             if (null != githubUserInfo && null != githubUserInfo.getId()) {
                 // 保存用户信息
+                githubUserInfo.setToken(githubAccessToken);
                 githubUserInfoRepository.save(githubUserInfo);
                 log.info("githubUserInfo=>{}", githubUserInfo);
 
-                /* 手动设置登录状态 jaas */
-                // credential 保存access token,
-                // principal 只保存用户id 节省空间, 需要详细信息时, 查询数据库或者用token调用用户信息接口
-                String principal = String.format("%s,%s", OAuthApp.GithubApp.class.getSimpleName(), githubUserInfo.getLogin());
+                /* 手动设置登录状态 jaas, java认证授权服务 */
                 JaasAuthenticationToken jaasAuthenticationToken =
-                        new JaasAuthenticationToken(principal, githubAccessToken, Collections.EMPTY_LIST, null);
+                        new JaasAuthenticationToken(githubUserInfo, githubAccessToken, Collections.EMPTY_LIST, null);
 //                jaasAuthenticationToken.setDetails(githubUserInfo); // 注释掉省内存
                 SecurityContextHolder.getContext().setAuthentication(jaasAuthenticationToken);
                 // 记住登录状态

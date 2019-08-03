@@ -1,5 +1,6 @@
-package com.github.xuqplus2.authserver.domain;
+package com.github.xuqplus2.authserver.domain.oauth;
 
+import com.github.xuqplus2.authserver.domain.BasicDomain;
 import lombok.Data;
 
 import javax.persistence.Entity;

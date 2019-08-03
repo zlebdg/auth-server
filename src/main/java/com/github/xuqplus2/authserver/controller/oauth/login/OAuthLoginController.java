@@ -1,7 +1,7 @@
 package com.github.xuqplus2.authserver.controller.oauth.login;
 
 import com.github.xuqplus2.authserver.config.OAuthApp;
-import com.github.xuqplus2.authserver.domain.OAuthCallbackAddress;
+import com.github.xuqplus2.authserver.domain.oauth.OAuthCallbackAddress;
 import com.github.xuqplus2.authserver.repository.OAuthCallbackAddressRepository;
 import com.github.xuqplus2.authserver.service.EncryptService;
 import com.github.xuqplus2.authserver.util.RandomUtil;
@@ -19,7 +19,7 @@ import java.net.URLEncoder;
 @RestController
 @RequestMapping("oauth/login")
 @Slf4j
-public class OauthLoginController {
+public class OAuthLoginController {
 
     private static final String TEMPLATE_AUTHORIZE_URL_GITHUB =
             "redirect:https://github.com/login/oauth/authorize?client_id=%s&redirect_uri=%s&scope=%s&state=%s";

@@ -1,12 +1,15 @@
-package com.github.xuqplus2.authserver.domain;
+package com.github.xuqplus2.authserver.domain.oauth;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -34,6 +37,11 @@ public class GithubUserInfo implements UserDetails {
     private Integer following;
     private Date created_at;
     private Date updated_at;
+
+    @ManyToOne
+    @ToString.Exclude
+    @JSONField(serialize = false)
+    private GithubAccessToken token;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

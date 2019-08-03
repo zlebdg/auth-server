@@ -11,6 +11,7 @@ public class BasicDomainListener {
         if (null == domain.getIsDeleted()) domain.setIsDeleted(false);
     }
 
+    // 无法监听到 @Query 注解的更新
     @PreUpdate
     public void PreUpdate(BasicDomain domain) {
         domain.setUpdateAt(System.currentTimeMillis());

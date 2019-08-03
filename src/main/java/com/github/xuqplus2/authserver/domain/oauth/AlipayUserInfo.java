@@ -1,4 +1,4 @@
-package com.github.xuqplus2.authserver.domain;
+package com.github.xuqplus2.authserver.domain.oauth;
 
 import lombok.Data;
 
