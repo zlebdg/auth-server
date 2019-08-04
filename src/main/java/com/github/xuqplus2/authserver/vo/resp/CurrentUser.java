@@ -31,13 +31,14 @@ public class CurrentUser extends VO {
     public CurrentUser(Authentication authentication) {
         Object principal = authentication.getPrincipal();
         if (principal instanceof AppUser) {
-            AppUser appUser = (AppUser) principal;
-            this.username = appUser.getUsername();
+            AppUser user = (AppUser) principal;
+            this.username = user.getUsername();
+            this.nickname = user.getUsername();
             this.authenticated = authentication.isAuthenticated();
-            this.authorities.addAll(appUser.getAuthorities().stream().map(authority -> {
+            this.authorities.addAll(user.getAuthorities().stream().map(authority -> {
                 return authority.getAuthority();
             }).collect(Collectors.toSet()));
-            this.roles.addAll(appUser.getAppRoles().stream().map(role -> {
+            this.roles.addAll(user.getAppRoles().stream().map(role -> {
                 return role.getRole();
             }).collect(Collectors.toSet()));
         } else if (principal instanceof GithubUserInfo) {

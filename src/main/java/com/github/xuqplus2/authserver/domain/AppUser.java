@@ -35,10 +35,12 @@ public class AppUser extends BasicDomain implements UserDetails {
     @Column(nullable = false)
     String password;
     /* cascade 级联操作权限 */
-    @ManyToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY)
+    // todo, 不知道怎么给spring security rememberMeFilter加上 @Transactional
+    // 只有改成 FetchType.EAGER
+    @ManyToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER)
     public Set<AppRole> appRoles;
     /* fetch 关联加载, 延迟/立即 */
-    @ManyToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER)
     public Set<AppAuthority> appAuthorities;
 
     public AppUser(AppRegister register, RegisterVerify verify) {
