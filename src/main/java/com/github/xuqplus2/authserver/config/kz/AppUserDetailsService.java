@@ -2,6 +2,7 @@ package com.github.xuqplus2.authserver.config.kz;
 
 import com.github.xuqplus2.authserver.config.OAuthApp;
 import com.github.xuqplus2.authserver.domain.AppUser;
+import com.github.xuqplus2.authserver.domain.oauth.AlipayUserInfo;
 import com.github.xuqplus2.authserver.domain.oauth.GithubUserInfo;
 import com.github.xuqplus2.authserver.repository.AlipayUserInfoRepository;
 import com.github.xuqplus2.authserver.repository.AppUserRepository;
@@ -16,6 +17,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class AppUserDetailsService implements UserDetailsService {
 
+    /* oauth 登录记住状态可维持2天 */
+    private static final long TOKEN_EXPIRES_MILLS = 1000L * 60 * 60 * 48;
+
     @Autowired
     AppUserRepository appUserRepository;
     @Autowired
@@ -27,20 +31,34 @@ public class AppUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        AppUser appUser = username.contains("@")
-                ? appUserRepository.getByEmail(username)
-                : appUserRepository.getByUsername(username);
-        if (null == appUser) {
-            // oauth用户信息
-            if (username.startsWith(OAuthApp.GithubApp.class.getSimpleName())) {
-                String oauthUsername = username.split(",")[1];
-                GithubUserInfo oauthUser = githubUserInfoRepository.getByLogin(oauthUsername);
-                if (null != oauthUser) {
-                    return oauthUser;
-                }
+        if (username.startsWith(OAuthApp.GithubApp.class.getSimpleName())) {
+            // GithubApp oauth remember-me
+            String oauthUsername = username.split(",")[1];
+            GithubUserInfo oauthUser = githubUserInfoRepository.getByLogin(oauthUsername);
+            if (null != oauthUser) {
+                return oauthUser;
             }
-            throw new UsernameNotFoundException("账号不存在");
+        } else if (username.startsWith(OAuthApp.AlipayApp.class.getSimpleName())) {
+            // AlipayApp oauth remember-me
+            String oauthUsername = username.split(",")[1];
+            AlipayUserInfo oauthUser = alipayUserInfoRepository.getByUserId(oauthUsername);
+            if (null != oauthUser && null != oauthUser.getToken()
+                    && System.currentTimeMillis() - oauthUser.getToken().getCreateAt() < TOKEN_EXPIRES_MILLS) {
+                return oauthUser;
+            }
+        } else if (username.contains("@")) {
+            // AppUser remember-me || AppUser form login
+            AppUser appUser = appUserRepository.getByEmail(username);
+            if (null != appUser) {
+                return appUser;
+            }
+        } else {
+            // AppUser remember-me || AppUser form login
+            AppUser appUser = appUserRepository.getByUsername(username);
+            if (null != appUser) {
+                return appUser;
+            }
         }
-        return appUser;
+        throw new UsernameNotFoundException("账号不存在");
     }
 }

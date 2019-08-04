@@ -50,13 +50,6 @@ public class CurrentUser extends VO {
             } else {
                 this.nickname = this.username;
             }
-        } else if (principal instanceof UserDetails) {
-            UserDetails user = (UserDetails) principal;
-            this.username = user.getUsername();
-            this.authenticated = authentication.isAuthenticated();
-            this.authorities.addAll(user.getAuthorities().stream().map(authority -> {
-                return authority.getAuthority();
-            }).collect(Collectors.toSet()));
         } else if (principal instanceof String) {
             this.username = (String) principal;
         }

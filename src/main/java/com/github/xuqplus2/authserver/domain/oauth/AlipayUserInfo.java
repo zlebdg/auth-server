@@ -1,7 +1,6 @@
 package com.github.xuqplus2.authserver.domain.oauth;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.github.xuqplus2.authserver.config.OAuthApp;
 import lombok.Data;
 import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
@@ -47,7 +46,7 @@ public class AlipayUserInfo implements UserDetails {
 
     @Override
     public String getUsername() {
-        return String.format("%s,%s", OAuthApp.AlipayApp.class.getSimpleName(), userId);
+        return userId;
     }
 
     @Override
