@@ -145,8 +145,12 @@ public class OAuthCallbackController {
         if (oAuthCallbackAddressRepository.existsByEncryptSessionIdAndIsDeletedFalse(state)) {
             OAuthCallbackAddress callbackAddress = oAuthCallbackAddressRepository.getByEncryptSessionIdAndIsDeletedFalse(state);
             String referer = callbackAddress.getReferer();
-            if (referer.endsWith("antd") || referer.endsWith("antd/")) {
-                response.sendRedirect(referer);
+            if (referer.endsWith("antd/")) {
+                response.sendRedirect(String.format("%s#/antd/oauth/callbackPage", referer));
+                return null;
+            }
+            if (referer.endsWith("antd")) {
+                response.sendRedirect(String.format("%s/#/antd/oauth/callbackPage", referer));
                 return null;
             }
         }
@@ -223,8 +227,12 @@ public class OAuthCallbackController {
         if (oAuthCallbackAddressRepository.existsByEncryptSessionIdAndIsDeletedFalse(state)) {
             OAuthCallbackAddress callbackAddress = oAuthCallbackAddressRepository.getByEncryptSessionIdAndIsDeletedFalse(state);
             String referer = callbackAddress.getReferer();
-            if (referer.endsWith("antd/") || referer.endsWith("antd")) {
-                response.sendRedirect(referer);
+            if (referer.endsWith("antd")) {
+                response.sendRedirect(String.format("%s/#/antd/oauth/callbackPage", referer));
+                return null;
+            }
+            if (referer.endsWith("antd/")) {
+                response.sendRedirect(String.format("%s#/antd/oauth/callbackPage", referer));
                 return null;
             }
         }
