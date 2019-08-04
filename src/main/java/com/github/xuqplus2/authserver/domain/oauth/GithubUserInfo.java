@@ -19,6 +19,7 @@ import java.util.Date;
 public class GithubUserInfo implements UserDetails {
     @Column(unique = true)
     private String login; // 用户名
+    private String avatar_url; // 头像地址
     @Id
     private Long id;
     private String node_id;
