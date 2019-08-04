@@ -21,9 +21,12 @@ import com.github.xuqplus2.authserver.vo.req.auth.reset.PasswordResetVerify;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.context.request.RequestContextHolder;
 
 import javax.transaction.Transactional;
 
@@ -33,19 +36,16 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     AppUserRepository appUserRepository;
-
     @Autowired
     AppRegisterRepository appRegisterRepository;
-
     @Autowired
     AppPasswordResetRepository appPasswordResetRepository;
-
+    @Autowired
+    PersistentTokenRepository persistentTokenRepository;
     @Autowired
     EncryptService encryptService;
-
     @Autowired
     DelegatingPasswordEncoder delegatingPasswordEncoder;
-
     @Autowired
     ApplicationEventPublisher eventPublisher;
 
@@ -171,6 +171,10 @@ public class AuthServiceImpl implements AuthService {
             appUserRepository.save(user);
             reset.setIsDeleted(true);
             appPasswordResetRepository.save(reset);
+            // 重置完成后， 清除 remember-me token
+            persistentTokenRepository.removeUserTokens(username);
+            // && 清除当前登录状态
+            SecurityContextHolder.getContext().setAuthentication(null);
             return;
         }
         throw new PassswordResetException("设置新密码失败");

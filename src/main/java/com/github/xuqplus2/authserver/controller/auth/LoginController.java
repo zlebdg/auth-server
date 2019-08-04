@@ -19,4 +19,11 @@ public class LoginController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return BasicResp.ok(new CurrentUser(authentication).toJSONString());
     }
+
+    // todo
+    @RequestMapping(value = "logout", method = {RequestMethod.GET, RequestMethod.POST}, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_JSON_UTF8_VALUE})
+    public ResponseEntity b() {
+        SecurityContextHolder.getContext().setAuthentication(null);
+        return BasicResp.ok();
+    }
 }
