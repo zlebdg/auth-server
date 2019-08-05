@@ -1,6 +1,8 @@
 package com.github.xuqplus2.authserver.domain.oauth;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.github.xuqplus2.authserver.config.OAuthApp;
+import com.github.xuqplus2.authserver.config.kz.RememberMeInfo;
 import lombok.Data;
 import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
@@ -14,7 +16,7 @@ import java.util.Collections;
 
 @Data
 @Entity
-public class AlipayUserInfo implements UserDetails {
+public class AlipayUserInfo implements UserDetails, RememberMeInfo {
     private String code;
     private String msg;
     private String avatar; // 头像uri
@@ -67,5 +69,15 @@ public class AlipayUserInfo implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    @Override
+    public final String getRememberName() {
+        return String.format("%s,%s", OAuthApp.AlipayApp.class.getSimpleName(), this.userId);
+    }
+
+    @Override
+    public final void setUsername(String username) {
+        this.userId = username;
     }
 }

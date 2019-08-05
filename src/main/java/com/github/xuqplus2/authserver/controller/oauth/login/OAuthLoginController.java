@@ -4,7 +4,6 @@ import com.github.xuqplus2.authserver.config.OAuthApp;
 import com.github.xuqplus2.authserver.domain.oauth.OAuthCallbackAddress;
 import com.github.xuqplus2.authserver.repository.OAuthCallbackAddressRepository;
 import com.github.xuqplus2.authserver.service.EncryptService;
-import com.github.xuqplus2.authserver.util.RandomUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

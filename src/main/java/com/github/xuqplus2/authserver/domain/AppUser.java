@@ -1,5 +1,6 @@
 package com.github.xuqplus2.authserver.domain;
 
+import com.github.xuqplus2.authserver.config.kz.RememberMeInfo;
 import com.github.xuqplus2.authserver.service.EncryptService;
 import com.github.xuqplus2.authserver.util.AuthorityUtil;
 import com.github.xuqplus2.authserver.util.RandomUtil;
@@ -20,7 +21,7 @@ import java.util.Set;
 @Entity
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class AppUser extends BasicDomain implements UserDetails {
+public class AppUser extends BasicDomain implements UserDetails, RememberMeInfo {
 
     private static final int PASSWORD_SALT_LENGTH = 16;
     public static final String DEFAULT_PASSWORD_ENCRYPT = "app"; // 密码加密方式
@@ -92,5 +93,10 @@ public class AppUser extends BasicDomain implements UserDetails {
     public void setNewPassword(String password, EncryptService encryptService) {
         this.salt = RandomUtil.string(PASSWORD_SALT_LENGTH);
         this.password = encryptService.encryptAppUserPassword(password);
+    }
+
+    @Override
+    public String getRememberName() {
+        return this.username;
     }
 }

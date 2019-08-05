@@ -1,6 +1,8 @@
 package com.github.xuqplus2.authserver.domain.oauth;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.github.xuqplus2.authserver.config.OAuthApp;
+import com.github.xuqplus2.authserver.config.kz.RememberMeInfo;
 import lombok.Data;
 import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
@@ -16,7 +18,7 @@ import java.util.Date;
 
 @Data
 @Entity
-public class GithubUserInfo implements UserDetails {
+public class GithubUserInfo implements UserDetails, RememberMeInfo {
     @Column(unique = true)
     private String login; // 用户名
     private String avatar_url; // 头像地址
@@ -77,5 +79,15 @@ public class GithubUserInfo implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    @Override
+    public final String getRememberName() {
+        return String.format("%s,%s", OAuthApp.GithubApp.class.getSimpleName(), this.login);
+    }
+
+    @Override
+    public final void setUsername(String username) {
+        this.login = username;
     }
 }

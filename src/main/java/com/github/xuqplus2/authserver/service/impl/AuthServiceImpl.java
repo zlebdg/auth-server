@@ -26,7 +26,6 @@ import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.springframework.web.context.request.RequestContextHolder;
 
 import javax.transaction.Transactional;
 
@@ -172,9 +171,9 @@ public class AuthServiceImpl implements AuthService {
             reset.setIsDeleted(true);
             appPasswordResetRepository.save(reset);
             // 重置完成后， 清除 remember-me token
-            persistentTokenRepository.removeUserTokens(username);
+            persistentTokenRepository.removeUserTokens(username); // 重置密码不用发生在oauth用户
             // && 清除当前登录状态
-            SecurityContextHolder.getContext().setAuthentication(null);
+            SecurityContextHolder.clearContext();
             return;
         }
         throw new PassswordResetException("设置新密码失败");

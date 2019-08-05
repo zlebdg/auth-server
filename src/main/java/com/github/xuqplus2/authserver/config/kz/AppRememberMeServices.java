@@ -1,8 +1,5 @@
 package com.github.xuqplus2.authserver.config.kz;
 
-import com.github.xuqplus2.authserver.config.OAuthApp;
-import com.github.xuqplus2.authserver.domain.oauth.AlipayUserInfo;
-import com.github.xuqplus2.authserver.domain.oauth.GithubUserInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -29,22 +26,27 @@ public class AppRememberMeServices extends PersistentTokenBasedRememberMeService
     @Override
     public void onLoginSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         Object principal = authentication.getPrincipal();
-        if (principal instanceof GithubUserInfo) {
-            GithubUserInfo info = (GithubUserInfo) principal;
+        if (principal instanceof RememberMeInfo) {
+            RememberMeInfo info = (RememberMeInfo) principal;
             String username = info.getUsername();
-            String rememberName = String.format("%s,%s", OAuthApp.GithubApp.class.getSimpleName(), username);
-            info.setLogin(rememberName);
+            String rememberName = info.getRememberName();
+            info.setUsername(rememberName);
             super.onLoginSuccess(request, response, authentication);
-            info.setLogin(username);
-        } else if (principal instanceof AlipayUserInfo) {
-            AlipayUserInfo info = (AlipayUserInfo) principal;
-            String username = info.getUsername();
-            String rememberName = String.format("%s,%s", OAuthApp.AlipayApp.class.getSimpleName(), username);
-            info.setUserId(rememberName);
-            super.onLoginSuccess(request, response, authentication);
-            info.setUserId(username);
+            info.setUsername(username);
         } else {
             super.onLoginSuccess(request, response, authentication);
+        }
+    }
+
+    @Override
+    public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof RememberMeInfo) {
+            String username = ((RememberMeInfo) principal).getUsername();
+            ((RememberMeInfo) principal).setUsername(((RememberMeInfo) principal).getRememberName());
+            super.logout(request, response, authentication);
+        } else {
+            super.logout(request, response, authentication);
         }
     }
 }
