@@ -74,8 +74,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/all",
                         "/**/**.html",
                         "/test**/**",
-                        "/oauth/**",
-                        "/auth/**/**",
+                        "/oauth**/**",
+                        "/auth**/**",
                         "/captcha**",
                         "/").permitAll()
                 .antMatchers("/oauth/**").permitAll()
