@@ -95,11 +95,12 @@ public class AppStartedListener implements ApplicationListener<ApplicationStarte
                     ") ENGINE = InnoDB" +
                     "  DEFAULT CHARSET = utf8";
 
-    private static final String CLIENT = "INSERT INTO oauth_client_details (client_secret, resource_ids, scope, authorized_grant_types," +
+    private static final String CLIENT =
+            "INSERT INTO oauth_client_details (client_secret, resource_ids, scope, authorized_grant_types," +
             "    web_server_redirect_uri, authorities, access_token_validity," +
             "    refresh_token_validity, additional_information, autoapprove, client_id)" +
             "VALUES ('{noop}secret', 'resourceId', 'aaa,bbb,ccc,ddd', 'authorization_code,refresh_token,implicit'," +
-            "   'http://blog.local:20000/login,http://aaa.local:20000/login,', null, null," +
+            "   'http://blog.local:5000/xxxx,http://blog.local:5000/login,http://blog.local:20000/login,http://106.12.80.76:8080/login,http://106.12.80.76:8081/login', null, null," +
             "   null, '{}', 'aaa,bbb,ccc,ddd', 'client')";
 
     public static final String[] DDL = {OAUTH_CLIENT_DETAILS, OAUTH_ACCESS_TOKEN, OAUTH_APPROVALS, OAUTH_CODE, OAUTH_REFRESH_TOKEN, PERSISTENT_LOGINS};
