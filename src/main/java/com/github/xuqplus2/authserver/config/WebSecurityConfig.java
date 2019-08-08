@@ -66,7 +66,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //                .openidLogin().loginPage("/login.html").and() // todo to be known
                 .formLogin()
                 .loginProcessingUrl("/login")
-                .loginPage("/login.html") // 重写登录网页
+//                .loginPage("/login.html") // 重写登录网页
+                .loginPage("http://auth.local:5010/antd/#/antd/oauth/loginPage") // 重写登录网页
                 .successHandler(authenticationSuccessHandler) // text/html,... | application/json(utf8)
                 .failureHandler(authenticationFailureHandler) // text/html,... | application/json(utf8)
                 .and()
