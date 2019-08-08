@@ -55,8 +55,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .formLogin()
                 .loginProcessingUrl("/login")
-                .loginPage("/login.html") // 重写登录网页
-//                .loginPage("http://auth.local:5010/antd/#/antd/oauth/loginPage") // 重写登录网页
                 .successHandler(authenticationSuccessHandler) // text/html,... | application/json(utf8)
                 .failureHandler(authenticationFailureHandler) // text/html,... | application/json(utf8)
                 .and()
@@ -126,7 +124,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public LoginUrlAuthenticationEntryPoint loginUrlAuthenticationEntryPoint() {
-        LoginUrlAuthenticationEntryPoint entryPoint = new LoginUrlAuthenticationEntryPoint("/login");
+        LoginUrlAuthenticationEntryPoint entryPoint =
+                new LoginUrlAuthenticationEntryPoint("/login.html");
+        entryPoint.setUseForward(true);
         return entryPoint;
     }
 }
