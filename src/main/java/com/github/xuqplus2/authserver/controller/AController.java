@@ -7,9 +7,6 @@ import com.github.xuqplus2.authserver.repository.GithubUserInfoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
-import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
-import org.springframework.security.oauth2.provider.token.DefaultUserAuthenticationConverter;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,9 +20,6 @@ public class AController {
 
     @GetMapping("/")
     public String a() {
-        OAuth2Authentication a;
-        DefaultTokenServices b;
-        DefaultUserAuthenticationConverter c;
         /* private static final ThreadLocal<SecurityContext> contextHolder = new ThreadLocal<>(); // 实现方法 */
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return String.format("授权信息: 名称=%s, 信息=%s, 凭据=%s, 权限=%s, ",
