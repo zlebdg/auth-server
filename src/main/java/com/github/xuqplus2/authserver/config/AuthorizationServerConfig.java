@@ -1,5 +1,6 @@
 package com.github.xuqplus2.authserver.config;
 
+import com.github.xuqplus2.authserver.config.kz.AppDefaultAccessTokenConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,7 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Aut
 import org.springframework.security.oauth2.provider.approval.JdbcApprovalStore;
 import org.springframework.security.oauth2.provider.approval.TokenApprovalStore;
 import org.springframework.security.oauth2.provider.client.JdbcClientDetailsService;
+import org.springframework.security.oauth2.provider.endpoint.CheckTokenEndpoint;
 import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
 import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 
@@ -126,5 +128,11 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
         JdbcClientDetailsService service = new JdbcClientDetailsService(dataSource);
         service.setPasswordEncoder(encoder);
         return service;
+    }
+
+    @Autowired
+    public void CheckTokenEndpoint(CheckTokenEndpoint endpoint) {
+        AppDefaultAccessTokenConverter converter = new AppDefaultAccessTokenConverter();
+        endpoint.setAccessTokenConverter(converter);
     }
 }
