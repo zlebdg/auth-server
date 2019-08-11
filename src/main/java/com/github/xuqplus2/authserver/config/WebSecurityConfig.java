@@ -107,7 +107,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .inMemoryAuthentication()
                 .passwordEncoder(delegatingPasswordEncoder)
                 .withUser("test").password(encryptService.encryptAppUserPassword("123456")).roles("test").and()
-                .withUser("root").password(encryptService.encryptAppUserPassword("123456")).roles("root");
+                .withUser("root").password(encryptService.encryptAppUserPassword("123456")).authorities("article");
     }
 
     @Bean
