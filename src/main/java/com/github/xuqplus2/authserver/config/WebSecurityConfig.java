@@ -57,8 +57,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .loginProcessingUrl("/login")
                 .successHandler(authenticationSuccessHandler) // text/html,... | application/json(utf8)
                 .failureHandler(authenticationFailureHandler) // text/html,... | application/json(utf8)
-                .and()
-                .logout().logoutUrl("/auth/logout").permitAll()
+//                .and()
+//                .logout().logoutUrl("/auth/logout").permitAll()
                 .and()
                 .authorizeRequests()
                 .antMatchers("/all",
