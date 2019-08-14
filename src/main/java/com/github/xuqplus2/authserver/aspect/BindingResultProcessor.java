@@ -52,11 +52,11 @@ public class BindingResultProcessor {
         for (Object arg : args) {
             if (arg instanceof BindingResult) {
                 BindingResult bindingResult = (BindingResult) arg;
-                if (null != bindingResult && bindingResult.hasErrors()) {
+                if (null != bindingResult && bindingResult.hasFieldErrors()) {
                     FieldError fieldError = bindingResult.getFieldError();
                     log.info("fieldError, objectName={}, field={}, message={}",
                             fieldError.getObjectName(), fieldError.getField(), fieldError.getDefaultMessage());
-                    throw new RuntimeException(fieldError.getDefaultMessage());
+                    throw new RuntimeException(fieldError.getField() + " " + fieldError.getDefaultMessage());
                 }
                 return;
             }
