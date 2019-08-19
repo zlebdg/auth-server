@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.accept.ContentNegotiationManager;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -51,6 +52,18 @@ public class AppExceptionHandler { // 捕获 Controller 内的异常
             return handleJson(request, message);
         }
         return handleHtml(request, message);
+    }
+
+    /**
+     * 抛出该异常, 使默认oauth登录授权流程继续
+     *
+     * @param e
+     * @return
+     */
+    @ExceptionHandler(value = InsufficientAuthenticationException.class)
+    public Object handle(InsufficientAuthenticationException e) {
+        log.error("e.message={}", e.getMessage());
+        throw e;
     }
 
     /**
