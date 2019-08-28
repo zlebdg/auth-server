@@ -1,20 +1,21 @@
 language: java
 env:
-  global:
-addons:
-  ssh_known_hosts:
+  - DEPLOY_CONTAINER_NAME=Test-auth-server
+  - DEPLOY_CONTAINER_WORKNET=worknet
 before_install:
   - env
+  - sudo apt-get install -y sshpass
 install:
   - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
 script:
   - mvn package -DskipTests=true
-  - docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
+  - docker login --username $DOCKER_HUB_USERNAME --password $DOCKER_HUB_PASSWORD
   - echo ENV GIT_COMMIT=$TRAVIS_COMMIT >> Dockerfile
   - docker build -t $TRAVIS_REPO_SLUG:$TRAVIS_BUILD_NUMBER .
   - docker push $TRAVIS_REPO_SLUG:$TRAVIS_BUILD_NUMBER
 after_success:
   - bash < (curl -s https://codecov.io/bash)
+  - sshpass -p $DEPLOY_HOST_SSH_PASSWORD ssh $DEPLOY_HOST_SSH_USERNAME@$DEPLOY_HOST "docker rm -f $DEPLOY_CONTAINER_NAME; docker run --name $DEPLOY_CONTAINER_NAME --network $DEPLOY_CONTAINER_WORKNET --restart always $TRAVIS_REPO_SLUG:$TRAVIS_BUILD_NUMBER; echo container started; exit;"
 notifications:
   email:
     recipients:
