@@ -5,13 +5,14 @@ addons:
   ssh_known_hosts:
 before_install:
   - env
-  - docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
 install:
   - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
 script:
   - mvn package -DskipTests=true
-  - docker build -t $DOCKER_USERNAME/$TRAVIS_REPO_SLUG:$TRAVIS_BUILD_NUMBER .
-  - docker push $DOCKER_USERNAME/$TRAVIS_REPO_SLUG:$TRAVIS_BUILD_NUMBER
+  - docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
+  - echo ENV GIT_COMMIT=$TRAVIS_COMMIT >> Dockerfile
+  - docker build -t $TRAVIS_REPO_SLUG:$TRAVIS_BUILD_NUMBER .
+  - docker push $TRAVIS_REPO_SLUG:$TRAVIS_BUILD_NUMBER
 after_success:
   - bash < (curl -s https://codecov.io/bash)
 notifications:
