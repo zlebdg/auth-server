@@ -1,7 +1,11 @@
 language: java
 env:
-  - DEPLOY_CONTAINER_NAME=Test-auth-server
-  - DEPLOY_CONTAINER_WORKNET=worknet
+  global:
+    - DEPLOY_CONTAINER_NAME=Test-auth-server
+    - DEPLOY_CONTAINER_WORKNET=worknet
+addons:
+  ssh_known_hosts:
+    - 106.12.80.76
 before_install:
   - env
   - sudo apt-get install -y sshpass
@@ -14,8 +18,9 @@ script:
   - docker build -t $TRAVIS_REPO_SLUG:$TRAVIS_BUILD_NUMBER .
   - docker push $TRAVIS_REPO_SLUG:$TRAVIS_BUILD_NUMBER
 after_success:
-  - bash < (curl -s https://codecov.io/bash)
-  - sshpass -p $DEPLOY_HOST_SSH_PASSWORD ssh $DEPLOY_HOST_SSH_USERNAME@$DEPLOY_HOST "docker rm -f $DEPLOY_CONTAINER_NAME; docker run --name $DEPLOY_CONTAINER_NAME --network $DEPLOY_CONTAINER_WORKNET --restart always $TRAVIS_REPO_SLUG:$TRAVIS_BUILD_NUMBER; echo container started; exit;"
+  - sshpass -p $DEPLOY_HOST_SSH_PASSWORD ssh $DEPLOY_HOST_SSH_USERNAME@$DEPLOY_HOST "docker rm -f $DEPLOY_CONTAINER_NAME; docker run --name $DEPLOY_CONTAINER_NAME --network $DEPLOY_CONTAINER_WORKNET --restart always $TRAVIS_REPO_SLUG:$TRAVIS_BUILD_NUMBER; echo container $DEPLOY_CONTAINER_NAME using image $TRAVIS_REPO_SLUG:$TRAVIS_BUILD_NUMBER started ..; exit;"
+  # <( is right
+  - bash <(curl -s https://codecov.io/bash)
 notifications:
   email:
     recipients:
