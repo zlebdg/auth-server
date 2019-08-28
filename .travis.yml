@@ -12,7 +12,7 @@ before_install:
 install:
   - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
 script:
-  - mvn package -DskipTests=true
+  - mvn package -DskipTests=true -Ptest
   - docker login --username $DOCKER_HUB_USERNAME --password $DOCKER_HUB_PASSWORD
   - echo ENV GIT_COMMIT=$TRAVIS_COMMIT >> Dockerfile
   - docker build -t $TRAVIS_REPO_SLUG:$TRAVIS_BUILD_NUMBER .
