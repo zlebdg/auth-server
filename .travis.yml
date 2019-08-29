@@ -1,8 +1,9 @@
 language: java
 env:
   global:
-    - DEPLOY_CONTAINER_NAME=Test-auth-server
+    - DEPLOY_CONTAINER_NAME=auth-server
     - DEPLOY_CONTAINER_WORKNET=worknet
+    - DOCKER_ALI_REGISTRY_HANGZHOU=registry.cn-hangzhou.aliyuncs.com
 addons:
   ssh_known_hosts:
     - 106.12.80.76
@@ -12,19 +13,23 @@ before_install:
 install:
   - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
 script:
+  # mvn build
   - mvn package -DskipTests=true -Ptest
-  - docker login --username $DOCKER_HUB_USERNAME --password $DOCKER_HUB_PASSWORD
+  # docker build
   - echo ENV GIT_COMMIT=$TRAVIS_COMMIT >> Dockerfile
   - docker build -t $TRAVIS_REPO_SLUG:$TRAVIS_BUILD_NUMBER .
+  # push to docker hub
+  - docker login --username $DOCKER_HUB_USERNAME --password $DOCKER_HUB_PASSWORD
   - docker push $TRAVIS_REPO_SLUG:$TRAVIS_BUILD_NUMBER
+  # push to aliyun
   - docker login --username $DOCKER_ALI_USERNAME --password $DOCKER_ALI_PASSWORD $DOCKER_ALI_REGISTRY_HANGZHOU
   - docker tag $TRAVIS_REPO_SLUG:$TRAVIS_BUILD_NUMBER $DOCKER_ALI_REGISTRY_HANGZHOU/$TRAVIS_REPO_SLUG:$TRAVIS_BUILD_NUMBER
   - docker push $DOCKER_ALI_REGISTRY_HANGZHOU/$TRAVIS_REPO_SLUG:$TRAVIS_BUILD_NUMBER
 after_success:
-  # - sshpass -p $DEPLOY_HOST_SSH_PASSWORD ssh $DEPLOY_HOST_SSH_USERNAME@$DEPLOY_HOST "docker rm -f $DEPLOY_CONTAINER_NAME; docker run --name $DEPLOY_CONTAINER_NAME --network $DEPLOY_CONTAINER_WORKNET --restart always $TRAVIS_REPO_SLUG:$TRAVIS_BUILD_NUMBER; echo container $DEPLOY_CONTAINER_NAME using image $TRAVIS_REPO_SLUG:$TRAVIS_BUILD_NUMBER started ..; exit;"
-  - sshpass -p $DEPLOY_HOST_SSH_PASSWORD ssh $DEPLOY_HOST_SSH_USERNAME@$DEPLOY_HOST "docker rm -f $DEPLOY_CONTAINER_NAME; docker run -itd --name $DEPLOY_CONTAINER_NAME --network $DEPLOY_CONTAINER_WORKNET --restart always $DOCKER_ALI_REGISTRY_HANGZHOU/$TRAVIS_REPO_SLUG:$TRAVIS_BUILD_NUMBER; echo container $DEPLOY_CONTAINER_NAME using image $DOCKER_ALI_REGISTRY_HANGZHOU/$TRAVIS_REPO_SLUG:$TRAVIS_BUILD_NUMBER started ..; exit;"
+  # - sshpass -p $DEPLOY_HOST_SSH_PASSWORD ssh $DEPLOY_HOST_SSH_USERNAME@$DEPLOY_HOST "docker rm -f Test-$DEPLOY_CONTAINER_NAME; docker run --name Test-$DEPLOY_CONTAINER_NAME --network $DEPLOY_CONTAINER_WORKNET --restart always $TRAVIS_REPO_SLUG:$TRAVIS_BUILD_NUMBER; echo container Test-$DEPLOY_CONTAINER_NAME using image $TRAVIS_REPO_SLUG:$TRAVIS_BUILD_NUMBER started ..; exit;"
+  - sshpass -p $DEPLOY_HOST_SSH_PASSWORD ssh $DEPLOY_HOST_SSH_USERNAME@$DEPLOY_HOST "docker rm -f Test-$DEPLOY_CONTAINER_NAME; docker run -itd --name Test-$DEPLOY_CONTAINER_NAME --network $DEPLOY_CONTAINER_WORKNET --restart always $DOCKER_ALI_REGISTRY_HANGZHOU/$TRAVIS_REPO_SLUG:$TRAVIS_BUILD_NUMBER; echo container Test-$DEPLOY_CONTAINER_NAME using image $DOCKER_ALI_REGISTRY_HANGZHOU/$TRAVIS_REPO_SLUG:$TRAVIS_BUILD_NUMBER started ..; exit;"
   # <( is right
-  - bash <(curl -s https://codecov.io/bash)
+  # - bash <(curl -s https://codecov.io/bash)
 notifications:
   email:
     recipients:
