@@ -15,10 +15,16 @@ import javax.persistence.ManyToOne;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
+
+import static com.github.xuqplus2.authserver.domain.AppAuthorities.ARTICLE;
 
 @Data
 @Entity
 public class GithubUserInfo implements UserDetails, RememberMeInfo {
+
+    public static final List<GrantedAuthority> GITHUB_USER_DEFAULT_AUTHORITIES = Collections.singletonList(ARTICLE.getAuthority());
+
     @Column(unique = true)
     private String login; // 用户名
     private String avatar_url; // 头像地址
@@ -48,7 +54,7 @@ public class GithubUserInfo implements UserDetails, RememberMeInfo {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.EMPTY_SET;
+        return GITHUB_USER_DEFAULT_AUTHORITIES;
     }
 
     @Override
