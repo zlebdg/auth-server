@@ -7,11 +7,12 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.validation.constraints.NotBlank;
+import java.io.Serializable;
 
 @Data
 @Entity
 @NoArgsConstructor
-public class AppAuthority {
+public class AppAuthority implements Serializable {
 
     @NotBlank
     @Column(length = 32)

@@ -13,15 +13,17 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
+
+import static com.github.xuqplus2.authserver.domain.AppAuthorities.ARTICLE;
 
 @Data
 @Entity
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class AppUser extends BasicDomain implements UserDetails, RememberMeInfo {
+
+    public static final List<GrantedAuthority> APP_USER_DEFAULT_AUTHORITIES = Collections.singletonList(ARTICLE.getAuthority());
 
     private static final int PASSWORD_SALT_LENGTH = 16;
     public static final String DEFAULT_PASSWORD_ENCRYPT = "app"; // 密码加密方式
@@ -56,6 +58,7 @@ public class AppUser extends BasicDomain implements UserDetails, RememberMeInfo 
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Set<GrantedAuthority> grantedAuthorities = new LinkedHashSet<>();
         AuthorityUtil.addAuthorities(grantedAuthorities, this);
+        grantedAuthorities.addAll(APP_USER_DEFAULT_AUTHORITIES);
         return grantedAuthorities;
     }
 
