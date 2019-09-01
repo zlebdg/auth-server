@@ -2,18 +2,22 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 </head>
 <body>
 <form method="post" action="/auth/register">
     账号:
     <input name="username" value="445172495@qq.com">
+    <br/>
     邮箱:
     <input name="email" value="445172495@qq.com">
+    <br/>
     验证码:
     <input name="captcha" value="" onautocomplete="false">
     <div style="width:200px;height:50px;display:inline-block;">
         <img src="/captcha" alt="点击刷新" onclick="src='/captcha';">
     </div>
+    <hr/>
     <input type="submit" value="注册" onclick="setTheValue(false)">
     <input type="submit" value="重发邮件" onclick="setTheValue(true)">
 
