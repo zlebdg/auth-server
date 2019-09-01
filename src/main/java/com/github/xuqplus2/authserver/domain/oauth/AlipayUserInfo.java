@@ -13,10 +13,16 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+
+import static com.github.xuqplus2.authserver.domain.AppAuthorities.ARTICLE;
 
 @Data
 @Entity
 public class AlipayUserInfo implements UserDetails, RememberMeInfo {
+
+    public static final List<GrantedAuthority> ALIPAY_USER_DEFAULT_AUTHORITIES = Collections.singletonList(ARTICLE.getAuthority());
+
     private String code;
     private String msg;
     private String avatar; // 头像uri
@@ -38,7 +44,7 @@ public class AlipayUserInfo implements UserDetails, RememberMeInfo {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.EMPTY_SET;
+        return ALIPAY_USER_DEFAULT_AUTHORITIES;
     }
 
     @Override
