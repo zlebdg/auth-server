@@ -14,7 +14,7 @@ public class TestJsController {
 
   @GetMapping("a.js")
   public void a(HttpServletResponse response) throws IOException {
-//    response.sendRedirect("https://github.githubassets.com/assets/frameworks-ab12e867.js");
+//    response.sendRedirect("http://px6vfmups.bkt.clouddn.com/q.js");
     if (System.currentTimeMillis() % 2 == 0) {
       response.sendRedirect("/test/js/c.js");
     } else {
@@ -29,7 +29,7 @@ public class TestJsController {
 
   @GetMapping("c.js")
   public void c(HttpServletResponse response) throws IOException {
-    response.setContentType("application/javascript");
+    response.setContentType("text/javascript");
     response.getWriter().write("console.log(2)");
   }
 }
