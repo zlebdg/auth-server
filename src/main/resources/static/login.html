@@ -6,30 +6,33 @@
 </head>
 <body>
 <hr>
-<a href="/oauth/login/github">Github授权登录>></a>
-<hr>
-<a href="/oauth/login/alipay">OpenAlipay授权登录>></a>
-<hr>
-
-<a href="/oauth/redirectTo/register" target="_blank">去注册>></a>
+<div style="text-align: right;">
+    <a href="/oauth/login/github">Github授权登录>></a>
+    <hr>
+    <a href="/oauth/login/alipay">OpenAlipay授权登录>></a>
+</div>
 <hr>
 
 <div style="text-align: center;">
     <h3 href="#">本系统账号登录</h3>
     <form method="post" action="/login">
         <label>账号</label>
-        <input name="username" value="root">
+        <input name="username" value="root" type="text">
         <br>
         <label>密码</label>
-        <input name="password" value="123456">
+        <input name="password" value="123456" type="password">
         <br>
-        <input type="checkbox" name="remember-me" checked="checked"
-               style="">
+        <input type="checkbox" name="remember-me">
         <label>记住我</label>
-        <br>
+        <hr>
         <input type="submit" value="登录"
                style="min-width: 10em;">
     </form>
+</div>
+<hr>
+
+<div style="text-align: right;">
+    <a href="/oauth/redirectTo/register" target="_blank">去注册>></a>
 </div>
 <hr>
 </body>
