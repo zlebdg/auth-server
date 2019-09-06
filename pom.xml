@@ -157,6 +157,9 @@
                 <pom.project.oauth.app.registerUri>
                     http://auth.local:5010/antd/#/antd/user/register
                 </pom.project.oauth.app.registerUri>
+                <pom.project.oauth.app.resetUri>
+                    http://auth.local:5010/antd/#/antd/user/reset
+                </pom.project.oauth.app.resetUri>
                 <!--oauth github-->
                 <pom.project.oauth.github.clientId>710b0af34533c7e3063c</pom.project.oauth.github.clientId>
                 <pom.project.oauth.github.clientSecret>40a9b64f98711f593267693cd90cc9ef4a9f1534
@@ -195,6 +198,9 @@
                 <pom.project.oauth.app.registerUri>
                     http://106.12.80.76:20011/antd/#/antd/user/register
                 </pom.project.oauth.app.registerUri>
+                <pom.project.oauth.app.resetUri>
+                    http://106.12.80.76:20011/antd/#/antd/user/reset
+                </pom.project.oauth.app.resetUri>
                 <!--oauth github-->
                 <pom.project.oauth.github.clientId>62d18ebb9de7c775c163</pom.project.oauth.github.clientId>
                 <pom.project.oauth.github.clientSecret>0352a6ca257942b0dad0b88ae64d1c896e70fe48
@@ -233,6 +239,9 @@
                 <pom.project.oauth.app.registerUri>
                     http://106.12.80.76:20010/antd/#/antd/user/register
                 </pom.project.oauth.app.registerUri>
+                <pom.project.oauth.app.resetUri>
+                    http://106.12.80.76:20010/antd/#/antd/user/reset
+                </pom.project.oauth.app.resetUri>
                 <!--oauth github-->
                 <pom.project.oauth.github.clientId>c6f3777aee61534747fc</pom.project.oauth.github.clientId>
                 <pom.project.oauth.github.clientSecret>afa923e964de88c6f9f9401294e938a684040f9e

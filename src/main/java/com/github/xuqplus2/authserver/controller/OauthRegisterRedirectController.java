@@ -15,8 +15,16 @@ public class OauthRegisterRedirectController {
     @Value("${project.oauth.app.registerUri}")
     String registerUri;
 
+    @Value("${project.oauth.app.resetUri}")
+    String resetUri;
+
     @GetMapping("/oauth/redirectTo/register")
     public void redirectRegister(HttpServletResponse response) throws IOException {
         response.sendRedirect(registerUri);
+    }
+
+    @GetMapping("/oauth/redirectTo/reset")
+    public void redirectReset(HttpServletResponse response) throws IOException {
+        response.sendRedirect(resetUri);
     }
 }
