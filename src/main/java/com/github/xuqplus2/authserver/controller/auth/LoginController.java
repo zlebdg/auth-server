@@ -38,7 +38,7 @@ public class LoginController {
         return BasicResp.ok(new CurrentUser(authentication).toJSONString());
     }
 
-    @CrossOrigin({"http://blog.local:5000", "null", "*"})
+    @CrossOrigin({"http://blog.loc:5000", "null", "*"})
     @Transactional
     @RequestMapping(value = "logout", method = {RequestMethod.GET, RequestMethod.POST}, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_JSON_UTF8_VALUE})
     public ResponseEntity logout(String accessToken, String refreshToken, HttpServletRequest request, HttpServletResponse response) {
@@ -63,7 +63,7 @@ public class LoginController {
         return BasicResp.ok();
     }
 
-    @CrossOrigin({"http://blog.local:5000", "null", "*"})
+    @CrossOrigin({"http://blog.loc:5000", "null", "*"})
     @Transactional
     @GetMapping(value = "logout", produces = {MediaType.TEXT_HTML_VALUE})
     public Object logout(String accessToken, String refreshToken, HttpServletRequest request, HttpServletResponse response, ModelAndView mav) throws IOException {
