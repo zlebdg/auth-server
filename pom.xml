@@ -200,7 +200,7 @@
                 <pom.project.oauth.github.clientId>62d18ebb9de7c775c163</pom.project.oauth.github.clientId>
                 <pom.project.oauth.github.clientSecret>0352a6ca257942b0dad0b88ae64d1c896e70fe48
                 </pom.project.oauth.github.clientSecret>
-                <pom.project.oauth.github.redirectUri>http://blog.java8.xyz:81/oauth/callback/github/
+                <pom.project.oauth.github.redirectUri>http://auth.java8.xyz:81/oauth/callback/github/
                 </pom.project.oauth.github.redirectUri>
                 <!--oauth alipay-->
                 <pom.project.oauth.alipay.appId>2019071065839125</pom.project.oauth.alipay.appId>
