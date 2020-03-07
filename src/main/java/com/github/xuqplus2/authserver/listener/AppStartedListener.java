@@ -100,7 +100,7 @@ public class AppStartedListener implements ApplicationListener<ApplicationStarte
             "    web_server_redirect_uri, authorities, access_token_validity," +
             "    refresh_token_validity, additional_information, autoapprove, client_id)" +
             "VALUES ('{noop}secret', 'resourceId', 'aaa,bbb,ccc,ddd', 'authorization_code,refresh_token,implicit'," +
-            "   'http://blog.java8.xyz:81/login,http://blog.loc:5000/login,http://blog.loc:20000/login,', null, null," +
+            "   'https://blog.java8.xyz:444/login,http://blog.loc:5000/login,http://blog.loc:20000/login,', null, null," +
             "   null, '{}', 'aaa,bbb,ccc,ddd', 'client')";
 
     public static final String[] DDL = {OAUTH_CLIENT_DETAILS, OAUTH_ACCESS_TOKEN, OAUTH_APPROVALS, OAUTH_CODE, OAUTH_REFRESH_TOKEN, PERSISTENT_LOGINS};

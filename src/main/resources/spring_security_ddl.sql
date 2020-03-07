@@ -111,5 +111,5 @@ INSERT INTO oauth_client_details (client_secret, resource_ids, scope, authorized
                                   web_server_redirect_uri, authorities, access_token_validity,
                                   refresh_token_validity, additional_information, autoapprove, client_id)
 VALUES ('{noop}secret', 'resourceId', 'aaa,bbb,ccc,ddd', 'authorization_code,refresh_token,implicit',
-        'http://blog.java8.xyz:81/login,http://blog.loc:20000/login,', '', null,
+        'https://blog.java8.xyz:444/login,http://blog.loc:20000/login,', '', null,
         null, '{}', 'aaa,bbb,ccc,ddd', 'client');

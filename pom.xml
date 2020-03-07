@@ -200,16 +200,16 @@
                 <pom.postfix.password>f5m0eRKA7miiyUNb</pom.postfix.password>
                 <!--oauth-->
                 <pom.project.oauth.app.registerUri>
-                    http://auth.java8.xyz:81/antd/#/antd/user/register
+                    https://auth.java8.xyz:444/antd/#/antd/user/register
                 </pom.project.oauth.app.registerUri>
                 <pom.project.oauth.app.resetUri>
-                    http://auth.java8.xyz:81/antd/#/antd/user/reset
+                    https://auth.java8.xyz:444/antd/#/antd/user/reset
                 </pom.project.oauth.app.resetUri>
                 <!--oauth github-->
                 <pom.project.oauth.github.clientId>62d18ebb9de7c775c163</pom.project.oauth.github.clientId>
                 <pom.project.oauth.github.clientSecret>0352a6ca257942b0dad0b88ae64d1c896e70fe48
                 </pom.project.oauth.github.clientSecret>
-                <pom.project.oauth.github.redirectUri>http://auth.java8.xyz:81/oauth/callback/github/
+                <pom.project.oauth.github.redirectUri>https://auth.java8.xyz:444/oauth/callback/github/
                 </pom.project.oauth.github.redirectUri>
                 <!--oauth alipay-->
                 <pom.project.oauth.alipay.appId>2019071065839125</pom.project.oauth.alipay.appId>
