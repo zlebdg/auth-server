@@ -178,6 +178,7 @@
                 <pom.project.oauth.alipay.domain>http://auth.loc:20010/</pom.project.oauth.alipay.domain>
                 <pom.project.oauth.alipay.authCallbackUrl>http://auth.loc:20010/oauth/callback/alipay/
                 </pom.project.oauth.alipay.authCallbackUrl>
+                <pom.project.redis>spring.redis.host=auth.loc</pom.project.redis>
             </properties>
         </profile>
         <profile>
@@ -219,6 +220,7 @@
                 <pom.project.oauth.alipay.domain>http://106.12.80.76:20011/</pom.project.oauth.alipay.domain>
                 <pom.project.oauth.alipay.authCallbackUrl>http://106.12.80.76:20011/oauth/callback/alipay/
                 </pom.project.oauth.alipay.authCallbackUrl>
+                <pom.project.redis>spring.redis.cluster.nodes=10.0.255.126:6379</pom.project.redis>
             </properties>
         </profile>
     </profiles>
