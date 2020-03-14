@@ -81,6 +81,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // ref: https://springcloud.cc/spring-security-zhcn.html#remember-me
                 .key(appRememberMeServices.getKey())
                 .and()
+                .cors().disable()
                 .csrf().disable()
         ;
     }
