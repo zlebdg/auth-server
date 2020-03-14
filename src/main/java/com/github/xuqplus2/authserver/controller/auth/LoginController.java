@@ -66,8 +66,12 @@ public class LoginController {
     @CrossOrigin({"http://blog.loc:5000", "null", "*"})
     @Transactional
     @GetMapping(value = "logout", produces = {MediaType.TEXT_HTML_VALUE})
-    public Object logout(String accessToken, String refreshToken, HttpServletRequest request, HttpServletResponse response, ModelAndView mav) throws IOException {
+    public Object logout(String redirectUri, String accessToken, String refreshToken, HttpServletRequest request, HttpServletResponse response, ModelAndView mav) throws IOException {
         ResponseEntity logout = this.logout(accessToken, refreshToken, request, response);
+        if (!StringUtils.isEmpty(redirectUri)) {
+            response.sendRedirect(redirectUri);
+            return null;
+        }
         String referer = request.getHeader("Referer");
         if (!StringUtils.isEmpty(referer)) {
             response.sendRedirect(referer);
