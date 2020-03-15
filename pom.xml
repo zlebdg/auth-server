@@ -157,13 +157,8 @@
                 <pom.postfix.protocol>smtps</pom.postfix.protocol>
                 <pom.postfix.username>xuqplus@163.com</pom.postfix.username>
                 <pom.postfix.password>f5m0eRKA7miiyUNb</pom.postfix.password>
-                <!--oauth-->
-                <pom.project.oauth.app.registerUri>
-                    http://auth.loc:5010/antd/#/antd/user/register
-                </pom.project.oauth.app.registerUri>
-                <pom.project.oauth.app.resetUri>
-                    http://auth.loc:5010/antd/#/antd/user/reset
-                </pom.project.oauth.app.resetUri>
+                <!--web index page-->
+                <pom.project.web.index>http://auth.loc:5010/antd/</pom.project.web.index>
                 <!--oauth github-->
                 <pom.project.oauth.github.clientId>710b0af34533c7e3063c</pom.project.oauth.github.clientId>
                 <pom.project.oauth.github.clientSecret>40a9b64f98711f593267693cd90cc9ef4a9f1534
@@ -199,13 +194,8 @@
                 <pom.postfix.protocol>smtps</pom.postfix.protocol>
                 <pom.postfix.username>xuqplus@163.com</pom.postfix.username>
                 <pom.postfix.password>f5m0eRKA7miiyUNb</pom.postfix.password>
-                <!--oauth-->
-                <pom.project.oauth.app.registerUri>
-                    https://auth.java8.xyz:444/antd/#/antd/user/register
-                </pom.project.oauth.app.registerUri>
-                <pom.project.oauth.app.resetUri>
-                    https://auth.java8.xyz:444/antd/#/antd/user/reset
-                </pom.project.oauth.app.resetUri>
+                <!--web index page-->
+                <pom.project.web.index>https://auth.java8.xyz:444/antd/</pom.project.web.index>
                 <!--oauth github-->
                 <pom.project.oauth.github.clientId>62d18ebb9de7c775c163</pom.project.oauth.github.clientId>
                 <pom.project.oauth.github.clientSecret>0352a6ca257942b0dad0b88ae64d1c896e70fe48

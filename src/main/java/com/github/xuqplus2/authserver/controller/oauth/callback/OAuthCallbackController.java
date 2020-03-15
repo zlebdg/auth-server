@@ -88,6 +88,7 @@ public class OAuthCallbackController {
             log.info("callbackAddress code=>{}, state=>{}, referer=>{}", code, state, callbackAddress);
             response.sendRedirect(String.format("%s/oauth/callback/github/?%s&redirect=true",
                     UrlUtil.getOrigin(callbackAddress.getReferer()), request.getQueryString()));
+            oAuthCallbackAddressRepository.delete(callbackAddress);
             return null;
         }
 
@@ -147,6 +148,7 @@ public class OAuthCallbackController {
             String referer = callbackAddress.getReferer();
             if (null != referer) {
                 response.sendRedirect(String.format("%s#/antd/oauth/callbackPage", referer));
+                oAuthCallbackAddressRepository.delete(callbackAddress);
                 return null;
             }
         }

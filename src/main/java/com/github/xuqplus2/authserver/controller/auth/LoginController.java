@@ -38,15 +38,10 @@ public class LoginController {
         return BasicResp.ok(new CurrentUser(authentication).toJSONString());
     }
 
-    @CrossOrigin({"http://blog.loc:5000", "null", "*"})
+    @CrossOrigin({"null", "*"})
     @Transactional
     @RequestMapping(value = "logout", method = {RequestMethod.GET, RequestMethod.POST}, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_JSON_UTF8_VALUE})
     public ResponseEntity logout(String accessToken, String refreshToken, HttpServletRequest request, HttpServletResponse response) {
-        String origin = request.getHeader("Origin");
-        if (!StringUtils.isEmpty(origin)) {
-            response.setHeader("Access-Control-Allow-Credentials", Boolean.TRUE.toString());
-            response.setHeader("Access-Control-Allow-Origin", origin);
-        }
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         // 清除 access token
         if (!StringUtils.isEmpty(accessToken)) {
@@ -63,7 +58,7 @@ public class LoginController {
         return BasicResp.ok();
     }
 
-    @CrossOrigin({"http://blog.loc:5000", "null", "*"})
+    @CrossOrigin({"null", "*"})
     @Transactional
     @GetMapping(value = "logout", produces = {MediaType.TEXT_HTML_VALUE})
     public Object logout(String redirectUri, String accessToken, String refreshToken, HttpServletRequest request, HttpServletResponse response, ModelAndView mav) throws IOException {

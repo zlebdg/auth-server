@@ -5,34 +5,33 @@ import com.github.xuqplus2.authserver.config.OAuthApp;
 import com.github.xuqplus2.authserver.repository.AlipayUserInfoRepository;
 import com.github.xuqplus2.authserver.repository.GithubUserInfoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
 @RestController
-public class AController {
+public class IndexController {
 
     @Autowired
     GithubUserInfoRepository githubUserInfoRepository;
     @Autowired
     AlipayUserInfoRepository alipayUserInfoRepository;
+    @Value("${project.web.index}")
+    String index;
 
     @GetMapping("/")
-    public String a() {
-        /* private static final ThreadLocal<SecurityContext> contextHolder = new ThreadLocal<>(); // 实现方法 */
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return String.format("授权信息: 名称=%s, 信息=%s, 凭据=%s, 权限=%s, ",
-                authentication.getName(),
-                JSON.toJSONString(authentication.getPrincipal()),
-                JSON.toJSONString(authentication.getCredentials()),
-                JSON.toJSONString(authentication.getAuthorities()));
+    public void index(HttpServletResponse response) throws IOException {
+        response.sendRedirect(index);
     }
 
     @GetMapping("userInfo")
     public String userInfo() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        return authentication.getDetails().toString();
         Object principal = authentication.getPrincipal();
         if (principal instanceof String) {
             String[] split = principal.toString().split(",");
