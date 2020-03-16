@@ -88,7 +88,6 @@ public class OAuthCallbackController {
             log.info("callbackAddress code=>{}, state=>{}, referer=>{}", code, state, callbackAddress);
             response.sendRedirect(String.format("%s/oauth/callback/github/?%s&redirect=true",
                     UrlUtil.getOrigin(callbackAddress.getReferer()), request.getQueryString()));
-            oAuthCallbackAddressRepository.delete(callbackAddress);
             return null;
         }
 
