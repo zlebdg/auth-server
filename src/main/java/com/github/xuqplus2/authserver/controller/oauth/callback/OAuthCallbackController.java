@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("oauth/callback")
@@ -76,7 +77,7 @@ public class OAuthCallbackController {
     private static final String TEMPLATE_OAUTH_ACCESS_TOKEN_URI_GITHUB =
             "https://github.com/login/oauth/access_token?client_id=%s&client_secret=%s&code=%s";
     private static final String TEMPLATE_OAUTH_USER_INFO_URI_GITHUB =
-            "https://api.github.com/user?access_token=%s";
+            "https://api.github.com/user";
 
     @GetMapping("github")
     public String github(String code, String state, boolean redirect, HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -92,7 +93,11 @@ public class OAuthCallbackController {
         }
 
         /* 获取 access token */
-        OkHttpClient okHttpClient = new OkHttpClient();
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .readTimeout(60, TimeUnit.SECONDS)
+                .writeTimeout(60, TimeUnit.SECONDS)
+                .connectTimeout(60, TimeUnit.SECONDS)
+                .build();
         GithubAccessToken githubAccessToken =
                 JSON.parseObject(okHttpClient.newCall(new Request.Builder()
                         .url(String.format(TEMPLATE_OAUTH_ACCESS_TOKEN_URI_GITHUB,
@@ -110,10 +115,10 @@ public class OAuthCallbackController {
             /* 获取 user info */
             GithubUserInfo githubUserInfo =
                     JSON.parseObject(okHttpClient.newCall(new Request.Builder()
-                            .url(String.format(
-                                    TEMPLATE_OAUTH_USER_INFO_URI_GITHUB,
-                                    githubAccessToken.getAccess_token()))
+                            .url(TEMPLATE_OAUTH_USER_INFO_URI_GITHUB)
                             .addHeader("accept", "application/json")
+                            // https://developer.github.com/changes/2020-02-10-deprecating-auth-through-query-param/
+                            .addHeader("Authorization", "token " + githubAccessToken.getAccess_token())
                             .build())
                             .execute().body().string(), GithubUserInfo.class);
             if (null != githubUserInfo && null != githubUserInfo.getId()) {

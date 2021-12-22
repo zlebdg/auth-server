@@ -148,7 +148,7 @@
                 <!--database-->
                 <pom.db.host>localhost</pom.db.host>
                 <pom.db.port>3306</pom.db.port>
-                <pom.db.database>test_auth_server</pom.db.database>
+                <pom.db.database>dev_auth_server</pom.db.database>
                 <pom.db.username>test</pom.db.username>
                 <pom.db.password>123456</pom.db.password>
                 <!--mail-->
@@ -183,7 +183,7 @@
                 <pom.project.profile>test</pom.project.profile>
                 <pom.server.port>8080</pom.server.port>
                 <!--database-->
-                <pom.db.host>mysql</pom.db.host>
+                <pom.db.host>host.docker.internal</pom.db.host>
                 <pom.db.port>3306</pom.db.port>
                 <pom.db.database>test_auth_server</pom.db.database>
                 <pom.db.username>test</pom.db.username>
@@ -195,12 +195,13 @@
                 <pom.postfix.username>xuqplus@163.com</pom.postfix.username>
                 <pom.postfix.password>f5m0eRKA7miiyUNb</pom.postfix.password>
                 <!--web index page-->
-                <pom.project.web.index>https://auth.java8.xyz:444/antd/</pom.project.web.index>
+                <pom.project.web.index>https://654e-223-167-21-215.ngrok.io/auth-web</pom.project.web.index>
                 <!--oauth github-->
                 <pom.project.oauth.github.clientId>62d18ebb9de7c775c163</pom.project.oauth.github.clientId>
                 <pom.project.oauth.github.clientSecret>0352a6ca257942b0dad0b88ae64d1c896e70fe48
                 </pom.project.oauth.github.clientSecret>
-                <pom.project.oauth.github.redirectUri>https://auth.java8.xyz:444/oauth/callback/github/
+                <pom.project.oauth.github.redirectUri>
+                    https://654e-223-167-21-215.ngrok.io/auth/oauth/callback/github/
                 </pom.project.oauth.github.redirectUri>
                 <!--oauth alipay-->
                 <pom.project.oauth.alipay.appId>2019071065839125</pom.project.oauth.alipay.appId>
@@ -210,7 +211,8 @@
                 <pom.project.oauth.alipay.domain>http://106.12.80.76:20011/</pom.project.oauth.alipay.domain>
                 <pom.project.oauth.alipay.authCallbackUrl>http://106.12.80.76:20011/oauth/callback/alipay/
                 </pom.project.oauth.alipay.authCallbackUrl>
-                <pom.project.redis>spring.redis.cluster.nodes=10.0.255.126:6379</pom.project.redis>
+                <!--<pom.project.redis>spring.redis.cluster.nodes=10.0.255.126:6379</pom.project.redis>-->
+                <pom.project.redis>spring.redis.host=host.docker.internal</pom.project.redis>
             </properties>
         </profile>
     </profiles>
