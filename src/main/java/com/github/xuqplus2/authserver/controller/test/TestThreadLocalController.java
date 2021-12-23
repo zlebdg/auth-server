@@ -17,7 +17,7 @@ import javax.servlet.http.HttpSession;
 
 @Slf4j
 @RestController
-@RequestMapping("test/threadLocal")
+@RequestMapping("auth/test/threadLocal")
 public class TestThreadLocalController {
 
     @GetMapping("a")

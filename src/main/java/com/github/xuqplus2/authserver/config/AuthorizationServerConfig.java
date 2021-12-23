@@ -85,6 +85,10 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
                 .authenticationManager(authenticationManager)
                 .allowedTokenEndpointRequestMethods(HttpMethod.GET, HttpMethod.POST);*/
         endpoints
+                // change default oauth paths
+                .pathMapping("/oauth/authorize", "/auth/oauth/authorize")
+                .pathMapping("/oauth/token", "/auth/oauth/token")
+                .pathMapping("/oauth/check_token", "/auth/oauth/check_token")
                 .tokenStore(jdbcTokenStore)
                 .approvalStore(jdbcApprovalStore)
                 .authenticationManager(authenticationManager)

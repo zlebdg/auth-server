@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @RestController
-@RequestMapping("oauth/callback")
+@RequestMapping("auth/oauth/callback")
 @Slf4j
 public class OAuthCallbackController {
 
@@ -87,8 +87,8 @@ public class OAuthCallbackController {
         if (!redirect && oAuthCallbackAddressRepository.existsByEncryptSessionIdAndIsDeletedFalse(state)) {
             OAuthCallbackAddress callbackAddress = oAuthCallbackAddressRepository.getByEncryptSessionIdAndIsDeletedFalse(state);
             log.info("callbackAddress code=>{}, state=>{}, referer=>{}", code, state, callbackAddress);
-            response.sendRedirect(String.format("%s/oauth/callback/github/?%s&redirect=true",
-                    UrlUtil.getOrigin(callbackAddress.getReferer()), request.getQueryString()));
+            response.sendRedirect(String.format("%s/%s?%s&redirect=true",
+                    UrlUtil.getOrigin(callbackAddress.getReferer()), request.getServletPath(), request.getQueryString()));
             return null;
         }
 
@@ -100,12 +100,12 @@ public class OAuthCallbackController {
                 .build();
         GithubAccessToken githubAccessToken =
                 JSON.parseObject(okHttpClient.newCall(new Request.Builder()
-                        .url(String.format(TEMPLATE_OAUTH_ACCESS_TOKEN_URI_GITHUB,
-                                githubApp.getClientId(),
-                                githubApp.getClientSecret(),
-                                code))
-                        .addHeader("accept", "application/json")
-                        .build())
+                                .url(String.format(TEMPLATE_OAUTH_ACCESS_TOKEN_URI_GITHUB,
+                                        githubApp.getClientId(),
+                                        githubApp.getClientSecret(),
+                                        code))
+                                .addHeader("accept", "application/json")
+                                .build())
                         .execute().body().string(), GithubAccessToken.class);
         log.info("githubAccessToken=>{}", githubAccessToken);
 
@@ -115,11 +115,11 @@ public class OAuthCallbackController {
             /* 获取 user info */
             GithubUserInfo githubUserInfo =
                     JSON.parseObject(okHttpClient.newCall(new Request.Builder()
-                            .url(TEMPLATE_OAUTH_USER_INFO_URI_GITHUB)
-                            .addHeader("accept", "application/json")
-                            // https://developer.github.com/changes/2020-02-10-deprecating-auth-through-query-param/
-                            .addHeader("Authorization", "token " + githubAccessToken.getAccess_token())
-                            .build())
+                                    .url(TEMPLATE_OAUTH_USER_INFO_URI_GITHUB)
+                                    .addHeader("accept", "application/json")
+                                    // https://developer.github.com/changes/2020-02-10-deprecating-auth-through-query-param/
+                                    .addHeader("Authorization", "token " + githubAccessToken.getAccess_token())
+                                    .build())
                             .execute().body().string(), GithubUserInfo.class);
             if (null != githubUserInfo && null != githubUserInfo.getId()) {
                 // 保存用户信息
@@ -151,7 +151,7 @@ public class OAuthCallbackController {
             OAuthCallbackAddress callbackAddress = oAuthCallbackAddressRepository.getByEncryptSessionIdAndIsDeletedFalse(state);
             String referer = callbackAddress.getReferer();
             if (null != referer) {
-                response.sendRedirect(String.format("%s#/antd/oauth/callbackPage", referer));
+                response.sendRedirect(String.format("%s#/auth-web/oauth/callbackPage", referer));
                 oAuthCallbackAddressRepository.delete(callbackAddress);
                 return null;
             }
@@ -229,12 +229,12 @@ public class OAuthCallbackController {
         if (oAuthCallbackAddressRepository.existsByEncryptSessionIdAndIsDeletedFalse(state)) {
             OAuthCallbackAddress callbackAddress = oAuthCallbackAddressRepository.getByEncryptSessionIdAndIsDeletedFalse(state);
             String referer = callbackAddress.getReferer();
-            if (referer.endsWith("antd")) {
-                response.sendRedirect(String.format("%s/#/antd/oauth/callbackPage", referer));
+            if (referer.endsWith("auth-web")) {
+                response.sendRedirect(String.format("%s/#/auth-web/oauth/callbackPage", referer));
                 return null;
             }
-            if (referer.endsWith("antd/")) {
-                response.sendRedirect(String.format("%s#/antd/oauth/callbackPage", referer));
+            if (referer.endsWith("auth-web/")) {
+                response.sendRedirect(String.format("%s#/auth-web/oauth/callbackPage", referer));
                 return null;
             }
         }

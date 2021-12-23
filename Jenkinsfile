@@ -22,7 +22,7 @@ node("win10") {
 
         }
         powershell('''
-            docker run -itd --restart always -p 50004:8080 --name auth-server local/auth-server
+            docker run -itd --restart always -p 50010:20010 --name auth-server local/auth-server
         ''')
     }
 }

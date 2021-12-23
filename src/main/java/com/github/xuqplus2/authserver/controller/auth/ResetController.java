@@ -27,7 +27,7 @@ import javax.validation.Valid;
 @Slf4j
 public class ResetController {
 
-    static final String REGISTER_VERIFY_URI = "%s/antd/#/antd/user/reset/verify";
+    static final String REGISTER_VERIFY_URI = "%s/auth-web/#/auth-web/user/reset/verify";
 
     @Autowired
     AuthService authService;

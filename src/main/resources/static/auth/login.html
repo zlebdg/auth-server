@@ -7,13 +7,13 @@
 <body>
 <hr>
 <div style="text-align: right;">
-    <a href="/oauth/login/github">Github授权登录>></a>
+    <a href="/auth/oauth/login/github">Github授权登录>></a>
 </div>
 <hr>
 
 <div style="text-align: center;">
     <h3 href="#">本系统账号登录</h3>
-    <form method="post" action="/login">
+    <form method="post" action="/auth/login">
         <label>账号</label>
         <input name="username" value="root" type="text">
         <br>
@@ -29,10 +29,10 @@
 
 <div>
     <div style="text-align: left; display: inline-block; width: 49%;">
-        <a href="/oauth/redirectTo/reset" target="_blank">忘记密码</a>
+        <a href="/auth/oauth/redirectTo/reset" target="_blank">忘记密码</a>
     </div>
     <div style="text-align: right; display: inline-block; width: 49%;">
-        <a href="/oauth/redirectTo/register" target="_blank">去注册>></a>
+        <a href="/auth/oauth/redirectTo/register" target="_blank">去注册>></a>
     </div>
 </div>
 <hr>

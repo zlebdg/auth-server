@@ -16,7 +16,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 @RestController
-@RequestMapping("oauth/login")
+@RequestMapping("auth/oauth/login")
 @Slf4j
 public class OAuthLoginController {
 

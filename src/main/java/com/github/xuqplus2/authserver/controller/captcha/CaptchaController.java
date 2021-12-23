@@ -11,7 +11,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("captcha")
+@RequestMapping("auth/captcha")
 public class CaptchaController {
 
     @Autowired

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URL;
 
 @RestController
 public class IndexController {
@@ -26,10 +27,15 @@ public class IndexController {
 
     @GetMapping("/")
     public void index(HttpServletResponse response) throws IOException {
+        if (index.contains("ngrok.io")) {
+            URL url = new URL(index);
+            response.sendRedirect(String.format("%s#%s", url.getPath(), url.getRef()));
+            return;
+        }
         response.sendRedirect(index);
     }
 
-    @GetMapping("userInfo")
+    @GetMapping("auth/userInfo")
     public String userInfo() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Object principal = authentication.getPrincipal();

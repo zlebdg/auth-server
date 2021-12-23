@@ -31,7 +31,7 @@ import javax.validation.Valid;
 @Slf4j
 public class RegisterController {
 
-    static final String REGISTER_VERIFY_URI = "%s/antd/#/antd/user/register/verify";
+    static final String REGISTER_VERIFY_URI = "%s/auth-web/#/auth-web/user/register/verify";
 
     @Autowired
     AuthService authService;

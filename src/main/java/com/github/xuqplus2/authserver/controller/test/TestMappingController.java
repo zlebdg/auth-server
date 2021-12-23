@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@RequestMapping("test/mapping")
+@RequestMapping("auth/test/mapping")
 @RestController
 public class TestMappingController {
     @Autowired

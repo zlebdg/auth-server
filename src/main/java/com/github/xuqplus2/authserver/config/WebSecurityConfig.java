@@ -54,24 +54,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticationEntryPoint(loginUrlAuthenticationEntryPoint)
                 .and()
                 .formLogin()
-                .loginProcessingUrl("/login")
+                .loginProcessingUrl("/auth/login")
                 .successHandler(authenticationSuccessHandler) // text/html,... | application/json(utf8)
                 .failureHandler(authenticationFailureHandler) // text/html,... | application/json(utf8)
-//                .and()
-//                .logout().logoutUrl("/auth/logout").permitAll()
                 .and()
+                // .logout().logoutUrl("/auth/logout").permitAll().and()
                 .authorizeRequests()
                 .antMatchers("/all",
                         "/**/**.html",
-                        "/test**/**",
                         "/oauth**/**",
                         "/auth**/**",
-                        "/captcha**",
                         "/").permitAll()
-                .antMatchers("/oauth/**").permitAll()
-                .antMatchers("/normal").hasRole("normal")
-                .antMatchers("/admin").hasRole("admin")
-                .antMatchers("/root").hasRole("root")
+                .antMatchers("/auth/normal").hasRole("normal")
+                .antMatchers("/auth/admin").hasRole("admin")
+                .antMatchers("/auth/root").hasRole("root")
                 .anyRequest().authenticated().and()
                 // token 持久化
                 .rememberMe()
@@ -127,7 +123,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public LoginUrlAuthenticationEntryPoint loginUrlAuthenticationEntryPoint() {
         LoginUrlAuthenticationEntryPoint entryPoint =
-                new LoginUrlAuthenticationEntryPoint("/login.html");
+                new LoginUrlAuthenticationEntryPoint("/auth/login.html");
         entryPoint.setUseForward(true);
         return entryPoint;
     }

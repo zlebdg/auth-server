@@ -7,9 +7,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URL;
 
 @RestController
-@RequestMapping
+@RequestMapping("auth/oauth")
 public class OauthRegisterRedirectController {
 
     @Value("${project.oauth.app.registerUri}")
@@ -18,13 +19,23 @@ public class OauthRegisterRedirectController {
     @Value("${project.oauth.app.resetUri}")
     String resetUri;
 
-    @GetMapping("/oauth/redirectTo/register")
+    @GetMapping("redirectTo/register")
     public void redirectRegister(HttpServletResponse response) throws IOException {
+        if (registerUri.contains("ngrok.io")) {
+            URL url = new URL(registerUri);
+            response.sendRedirect(String.format("%s#%s", url.getPath(), url.getRef()));
+            return;
+        }
         response.sendRedirect(registerUri);
     }
 
-    @GetMapping("/oauth/redirectTo/reset")
+    @GetMapping("redirectTo/reset")
     public void redirectReset(HttpServletResponse response) throws IOException {
+        if (resetUri.contains("ngrok.io")) {
+            URL url = new URL(resetUri);
+            response.sendRedirect(String.format("%s#%s", url.getPath(), url.getRef()));
+            return;
+        }
         response.sendRedirect(resetUri);
     }
 }

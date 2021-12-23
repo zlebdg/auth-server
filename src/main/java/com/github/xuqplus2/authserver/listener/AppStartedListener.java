@@ -95,12 +95,19 @@ public class AppStartedListener implements ApplicationListener<ApplicationStarte
                     ") ENGINE = InnoDB" +
                     "  DEFAULT CHARSET = utf8";
 
+    private static final String CLIENT_URLS = String.join(",",
+            "http://blog.loc:5000/blog/login",
+            "http://blog.loc:5000/login",
+            "https://1991-103-140-136-251.ngrok.io/blog/login",
+            "https://1991-103-140-136-251.ngrok.io/login",
+            "http://blog.loc:20000/blog/login",
+            "http://blog.loc:20000/login");
     private static final String CLIENT =
             "INSERT INTO oauth_client_details (client_secret, resource_ids, scope, authorized_grant_types," +
             "    web_server_redirect_uri, authorities, access_token_validity," +
             "    refresh_token_validity, additional_information, autoapprove, client_id)" +
             "VALUES ('{noop}secret', 'resourceId', 'aaa,bbb,ccc,ddd', 'authorization_code,refresh_token,implicit'," +
-            "   'https://718a-223-167-21-215.ngrok.io/blog/login,https://blog.java8.xyz:444/login,http://blog.loc:5000/login,http://blog.loc:20000/login,', null, null," +
+            "   '" + CLIENT_URLS + "', null, null," +
             "   null, '{}', 'aaa,bbb,ccc,ddd', 'client')";
 
     public static final String[] DDL = {OAUTH_CLIENT_DETAILS, OAUTH_ACCESS_TOKEN, OAUTH_APPROVALS, OAUTH_CODE, OAUTH_REFRESH_TOKEN, PERSISTENT_LOGINS};

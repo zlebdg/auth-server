@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 @RestController
-@RequestMapping("test/captcha")
+@RequestMapping("auth/test/captcha")
 @Slf4j
 public class TestCaptchaController {
 
