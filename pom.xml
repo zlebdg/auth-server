@@ -159,6 +159,10 @@
                 <pom.postfix.password>f5m0eRKA7miiyUNb</pom.postfix.password>
                 <!--web index page-->
                 <pom.project.web.index>http://auth.loc:5010/auth-web/</pom.project.web.index>
+                <!--blog app login-->
+                <pom.project.blog.client.pre-established-redirect-uri>
+                    http://blog.loc:5000/blog/login
+                </pom.project.blog.client.pre-established-redirect-uri>
                 <!--oauth github-->
                 <pom.project.oauth.github.clientId>710b0af34533c7e3063c</pom.project.oauth.github.clientId>
                 <pom.project.oauth.github.clientSecret>40a9b64f98711f593267693cd90cc9ef4a9f1534
@@ -196,6 +200,10 @@
                 <pom.postfix.password>f5m0eRKA7miiyUNb</pom.postfix.password>
                 <!--web index page-->
                 <pom.project.web.index>https://654e-223-167-21-215.ngrok.io/auth-web</pom.project.web.index>
+                <!--blog app login-->
+                <pom.project.blog.client.pre-established-redirect-uri>
+                    https://1991-103-140-136-251.ngrok.io/blog/login
+                </pom.project.blog.client.pre-established-redirect-uri>
                 <!--oauth github-->
                 <pom.project.oauth.github.clientId>62d18ebb9de7c775c163</pom.project.oauth.github.clientId>
                 <pom.project.oauth.github.clientSecret>e2068e4f077a2a89962483600181e228cdcbd3ae

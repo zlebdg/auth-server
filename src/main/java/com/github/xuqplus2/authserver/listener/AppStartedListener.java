@@ -14,6 +14,8 @@ public class AppStartedListener implements ApplicationListener<ApplicationStarte
 
     @Value("${spring.jpa.hibernate.ddl-auto:none}")
     String ddl;
+    @Value("${project.blog.client.pre-established-redirect-uri:}")
+    String blogLoginUrl;
 
     @Autowired
     JdbcTemplate jdbcTemplate;
@@ -95,23 +97,19 @@ public class AppStartedListener implements ApplicationListener<ApplicationStarte
                     ") ENGINE = InnoDB" +
                     "  DEFAULT CHARSET = utf8";
 
-    private static final String CLIENT_URLS = String.join(",",
-            "http://blog.loc:5000/blog/login",
-            "http://blog.loc:5000/login",
-            "https://1991-103-140-136-251.ngrok.io/blog/login",
-            "https://1991-103-140-136-251.ngrok.io/login",
-            "http://blog.loc:20000/blog/login",
-            "http://blog.loc:20000/login");
-    private static final String CLIENT =
+    private static final String CLIENT_URLS_TEMPLATE = String.join(",",
+            "%s",
+            "http://blog.loc:20000/blog/login");
+    private static final String CLIENT_TEMPLATE =
             "INSERT INTO oauth_client_details (client_secret, resource_ids, scope, authorized_grant_types," +
             "    web_server_redirect_uri, authorities, access_token_validity," +
             "    refresh_token_validity, additional_information, autoapprove, client_id)" +
             "VALUES ('{noop}secret', 'resourceId', 'aaa,bbb,ccc,ddd', 'authorization_code,refresh_token,implicit'," +
-            "   '" + CLIENT_URLS + "', null, null," +
+            "   '%s', null, null," +
             "   null, '{}', 'aaa,bbb,ccc,ddd', 'client')";
 
     public static final String[] DDL = {OAUTH_CLIENT_DETAILS, OAUTH_ACCESS_TOKEN, OAUTH_APPROVALS, OAUTH_CODE, OAUTH_REFRESH_TOKEN, PERSISTENT_LOGINS};
-    public static final String[] DML = {"delete from oauth_client_details where client_id = 'client'", CLIENT};
+    public static final String[] DML = {"delete from oauth_client_details where client_id = 'client'", null};
 
     @Override
     public void onApplicationEvent(ApplicationStartedEvent applicationStartedEvent) {
@@ -121,6 +119,7 @@ public class AppStartedListener implements ApplicationListener<ApplicationStarte
                 jdbcTemplate.execute(sql);
             }
         }
+        DML[1] = String.format(CLIENT_TEMPLATE, String.format(CLIENT_URLS_TEMPLATE, blogLoginUrl));
         for (String sql : DML) {
             jdbcTemplate.execute(sql);
         }
